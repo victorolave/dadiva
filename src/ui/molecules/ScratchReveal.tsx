@@ -33,6 +33,9 @@ const BRUSH_RADIUS = 26
 /** Cada cuántos milisegundos se recalcula cuánto se ha raspado. */
 const SAMPLE_INTERVAL_MS = 120
 
+/** Duración del fundido de la capa al completarse el raspado. */
+const FADE_MS = 420
+
 /**
  * Raspa para revelar.
  *
@@ -61,6 +64,7 @@ export const ScratchReveal = ({
   const lastPoint = useRef<{ x: number; y: number } | null>(null)
   const lastSampleAt = useRef(0)
   const hasRevealed = useRef(false)
+  const fadeTimer = useRef<number | undefined>(undefined)
 
   const [isRevealed, setIsRevealed] = useState(false)
   const [hasScratched, setHasScratched] = useState(false)
@@ -70,18 +74,26 @@ export const ScratchReveal = ({
     hasRevealed.current = true
 
     const canvas = canvasRef.current
+    const reduced = prefersReducedMotion()
+
     if (canvas) {
-      if (prefersReducedMotion()) {
-        canvas.style.opacity = '0'
-      } else {
-        canvas.style.transition = 'opacity 420ms ease-out'
-        canvas.style.opacity = '0'
-      }
+      if (!reduced) canvas.style.transition = `opacity ${FADE_MS}ms ease-out`
+      canvas.style.opacity = '0'
     }
 
-    setIsRevealed(true)
-    onRevealed()
+    // El aviso al padre se retrasa hasta que el fundido termina.
+    // Antes se llamaba de inmediato y el padre cambiaba el elemento en el
+    // acto: el fundido existía en el código pero nunca se veía.
+    const finish = () => {
+      setIsRevealed(true)
+      onRevealed()
+    }
+
+    if (reduced) finish()
+    else fadeTimer.current = window.setTimeout(finish, FADE_MS)
   }, [onRevealed])
+
+  useEffect(() => () => window.clearTimeout(fadeTimer.current), [])
 
   /** Pinta la cubierta. Se rehace si cambia el tamaño y aún nadie ha raspado. */
   const paintCover = useCallback(async () => {
