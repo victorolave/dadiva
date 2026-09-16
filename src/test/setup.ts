@@ -19,3 +19,11 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 })
+
+// jsdom tampoco implementa scrollTo (lo llama RouteAnnouncer al cambiar de
+// ruta): sin este mock, cada test de navegación imprime un error de consola
+// que no aporta nada.
+Object.defineProperty(window, 'scrollTo', {
+  writable: true,
+  value: vi.fn(),
+})

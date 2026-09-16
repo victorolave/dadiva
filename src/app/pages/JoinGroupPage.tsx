@@ -7,8 +7,14 @@ import { InviteCode } from '@modules/groups/domain/value-objects/InviteCode'
 import { useEntranceAnimation } from '@animations'
 import { Alert, Button, Sticker, TextField, VisibilityNote } from '@ui/atoms'
 import { Blob, Isotipo } from '@ui/brand'
+import { usePageMeta } from '../seo/usePageMeta'
 
 export const JoinGroupPage = () => {
+  // El título nunca lleva el código de invitación: es una llave de acceso al
+  // grupo (ver el comentario de `redactUrl.ts`) y `document.title` queda
+  // visible en el historial del navegador.
+  usePageMeta({ title: 'Unirme a un grupo · Dádiva' })
+
   const { groups } = useContainer()
   const { user } = useAuth()
   const navigate = useNavigate()

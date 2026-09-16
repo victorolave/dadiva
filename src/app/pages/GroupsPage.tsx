@@ -9,11 +9,16 @@ import {
 import { useEntranceAnimation } from '@animations'
 import { Alert, Badge, LinkButton, Skeleton, Sticker } from '@ui/atoms'
 import { StateBlock } from '@ui/molecules/StateBlock'
+import { usePageMeta } from '../seo/usePageMeta'
 
 const formatDate = (date: Date): string =>
   new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'long' }).format(date)
 
 export const GroupsPage = () => {
+  // Ruta privada: sin descripción ni canonical, y con
+  // `X-Robots-Tag: noindex` en vercel.json.
+  usePageMeta({ title: 'Mis grupos · Dádiva' })
+
   const { groups, error, isLoading } = useMyGroups()
   const containerRef = useEntranceAnimation<HTMLDivElement>({ stagger: 0.06 }, [groups?.length])
 

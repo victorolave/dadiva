@@ -5,8 +5,11 @@ import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import type { DomainError } from '@core/domain/DomainError'
 import { useEntranceAnimation } from '@animations'
 import { Alert, Button, LinkButton, Sticker, TextAreaField, TextField } from '@ui/atoms'
+import { usePageMeta } from '../seo/usePageMeta'
 
 export const CreateGroupPage = () => {
+  usePageMeta({ title: 'Nuevo grupo · Dádiva' })
+
   const { groups } = useContainer()
   const { user } = useAuth()
   const navigate = useNavigate()

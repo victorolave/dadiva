@@ -20,6 +20,7 @@ import { PROMISE_CATALOG } from '@modules/promises/infrastructure/data/promiseCa
 import type { PromiseCard } from '@modules/promises/domain/entities/PromiseCard'
 import { WishlistSection } from '@modules/wishlist/presentation/components/WishlistSection'
 import { Alert, Badge, Button, Skeleton, Sticker, VisibilityNote } from '@ui/atoms'
+import { usePageMeta } from '../seo/usePageMeta'
 
 const formatDate = (date: Date): string =>
   new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(date)
@@ -38,6 +39,11 @@ export const GroupDetailPage = () => {
 
   const groupId = id ? asGroupId(id) : null
   const { group, error, isLoading, reload, refresh } = useGroupDetail(groupId)
+
+  // Antes de que cargue el grupo (o si falla) no hay nombre que mostrar: el
+  // hook se llama siempre, sin importar el `return` anticipado de abajo, así
+  // que el título nunca queda pegado al de la página anterior.
+  usePageMeta({ title: group ? `${group.name} · Dádiva` : 'Grupo · Dádiva' })
 
   const [assignment, setAssignment] = useState<MyAssignment | null>(null)
   const [promise, setPromise] = useState<PromiseCard | null>(null)

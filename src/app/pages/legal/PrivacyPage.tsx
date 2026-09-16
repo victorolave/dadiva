@@ -1,3 +1,4 @@
+import { usePageMeta } from '../../seo/usePageMeta'
 import { LegalLayout } from './LegalLayout'
 
 const CONTACT = 'victorolave1131@gmail.com'
@@ -10,128 +11,136 @@ const CONTACT = 'victorolave1131@gmail.com'
  * no se menciona ninguno que no recojamos. Una política que promete de más o
  * de menos es peor que no tenerla.
  */
-export const PrivacyPage = () => (
-  <LegalLayout title="Política de privacidad" updatedAt="16 de septiembre de 2026">
-    <section className="flex flex-col gap-3">
-      <p>
-        Dádiva es una aplicación para organizar intercambios de regalos entre grupos de
-        personas conocidas. Esta política explica exactamente qué datos guardamos, por qué,
-        y qué puedes hacer con ellos.
-      </p>
-    </section>
+export const PrivacyPage = () => {
+  usePageMeta({
+    title: 'Política de privacidad · Dádiva',
+    description: 'Qué datos guarda Dádiva, para qué los usa y cómo pedir que los borres.',
+    canonicalPath: '/privacidad',
+  })
 
-    <section className="flex flex-col gap-3">
-      <h2>Qué datos recogemos</h2>
+  return (
+    <LegalLayout title="Política de privacidad" updatedAt="16 de septiembre de 2026">
+      <section className="flex flex-col gap-3">
+        <p>
+          Dádiva es una aplicación para organizar intercambios de regalos entre grupos de
+          personas conocidas. Esta política explica exactamente qué datos guardamos, por qué,
+          y qué puedes hacer con ellos.
+        </p>
+      </section>
 
-      <p>
-        <strong className="text-ink">Cuando entras con Google</strong>, recibimos únicamente
-        tu nombre y tu dirección de correo. No pedimos ni recibimos acceso a tus contactos,
-        a tu calendario, a tus archivos ni al contenido de tu correo.
-      </p>
+      <section className="flex flex-col gap-3">
+        <h2>Qué datos recogemos</h2>
 
-      <p>
-        <strong className="text-ink">Cuando usas la aplicación</strong>, guardamos lo que tú
-        escribes:
-      </p>
+        <p>
+          <strong className="text-ink">Cuando entras con Google</strong>, recibimos únicamente
+          tu nombre y tu dirección de correo. No pedimos ni recibimos acceso a tus contactos,
+          a tu calendario, a tus archivos ni al contenido de tu correo.
+        </p>
 
-      <ul className="flex flex-col gap-1.5">
-        <li>El nombre y el emoji que eliges mostrar en cada grupo.</li>
-        <li>Los grupos que creas: nombre, descripción, fecha del intercambio y presupuesto.</li>
-        <li>Tu lista de deseos, si decides escribir una.</li>
-        <li>La tarjeta de promesa que sacas en cada grupo.</li>
-        <li>A quién te tocó regalar, resultado del sorteo.</li>
-      </ul>
+        <p>
+          <strong className="text-ink">Cuando usas la aplicación</strong>, guardamos lo que tú
+          escribes:
+        </p>
 
-      <p>
-        No usamos cookies de publicidad ni de seguimiento. Para saber cuántas visitas recibe
-        la aplicación y qué tan rápido carga, usamos Vercel Web Analytics y Speed Insights.
-        No usan cookies, no reciben tu nombre ni tu correo, y antes de enviar cada visita
-        quitamos de la dirección los códigos de invitación y los identificadores de grupo.
-      </p>
-    </section>
+        <ul className="flex flex-col gap-1.5">
+          <li>El nombre y el emoji que eliges mostrar en cada grupo.</li>
+          <li>Los grupos que creas: nombre, descripción, fecha del intercambio y presupuesto.</li>
+          <li>Tu lista de deseos, si decides escribir una.</li>
+          <li>La tarjeta de promesa que sacas en cada grupo.</li>
+          <li>A quién te tocó regalar, resultado del sorteo.</li>
+        </ul>
 
-    <section className="flex flex-col gap-3">
-      <h2>Quién puede ver tus datos</h2>
+        <p>
+          No usamos cookies de publicidad ni de seguimiento. Para saber cuántas visitas recibe
+          la aplicación y qué tan rápido carga, usamos Vercel Web Analytics y Speed Insights.
+          No usan cookies, no reciben tu nombre ni tu correo, y antes de enviar cada visita
+          quitamos de la dirección los códigos de invitación y los identificadores de grupo.
+        </p>
+      </section>
 
-      <p>
-        Los demás miembros de un grupo ven tu nombre, tu emoji y tu lista de deseos. Eso es
-        justamente lo que hace funcionar el intercambio. Cuando se hace el sorteo, además, le
-        mostramos tu lista de forma destacada a la persona a la que le toca regalarte.
-      </p>
+      <section className="flex flex-col gap-3">
+        <h2>Quién puede ver tus datos</h2>
 
-      <p>
-        <strong className="text-ink">Tu asignación del sorteo es secreta de verdad.</strong>{' '}
-        Solo tú puedes ver a quién te tocó regalar. Nadie más puede consultarla: ni los otros
-        participantes, ni quien organiza el grupo. Esa restricción está aplicada en la base de
-        datos mediante políticas de seguridad a nivel de fila, no solo escondida en la
-        interfaz.
-      </p>
-    </section>
+        <p>
+          Los demás miembros de un grupo ven tu nombre, tu emoji y tu lista de deseos. Eso es
+          justamente lo que hace funcionar el intercambio. Cuando se hace el sorteo, además, le
+          mostramos tu lista de forma destacada a la persona a la que le toca regalarte.
+        </p>
 
-    <section className="flex flex-col gap-3">
-      <h2>Dónde viven tus datos</h2>
+        <p>
+          <strong className="text-ink">Tu asignación del sorteo es secreta de verdad.</strong>{' '}
+          Solo tú puedes ver a quién te tocó regalar. Nadie más puede consultarla: ni los otros
+          participantes, ni quien organiza el grupo. Esa restricción está aplicada en la base de
+          datos mediante políticas de seguridad a nivel de fila, no solo escondida en la
+          interfaz.
+        </p>
+      </section>
 
-      <p>
-        La base de datos y la autenticación están alojadas en Supabase, sobre infraestructura
-        de Amazon Web Services en Estados Unidos. La aplicación se sirve desde Vercel. No
-        vendemos, alquilamos ni compartimos tus datos con terceros para fines comerciales.
-      </p>
-    </section>
+      <section className="flex flex-col gap-3">
+        <h2>Dónde viven tus datos</h2>
 
-    <section className="flex flex-col gap-3">
-      <h2>Tus derechos</h2>
+        <p>
+          La base de datos y la autenticación están alojadas en Supabase, sobre infraestructura
+          de Amazon Web Services en Estados Unidos. La aplicación se sirve desde Vercel. No
+          vendemos, alquilamos ni compartimos tus datos con terceros para fines comerciales.
+        </p>
+      </section>
 
-      <p>Puedes, en cualquier momento:</p>
+      <section className="flex flex-col gap-3">
+        <h2>Tus derechos</h2>
 
-      <ul className="flex flex-col gap-1.5">
-        <li>Cambiar tu nombre visible y tu emoji desde tu perfil.</li>
-        <li>Editar o borrar tu lista de deseos.</li>
-        <li>
-          Pedir que te saquemos de un grupo antes de que se haga el sorteo, escribiendo a{' '}
+        <p>Puedes, en cualquier momento:</p>
+
+        <ul className="flex flex-col gap-1.5">
+          <li>Cambiar tu nombre visible y tu emoji desde tu perfil.</li>
+          <li>Editar o borrar tu lista de deseos.</li>
+          <li>
+            Pedir que te saquemos de un grupo antes de que se haga el sorteo, escribiendo a{' '}
+            <a href={`mailto:${CONTACT}`} className="link">
+              {CONTACT}
+            </a>
+            . Todavía no hay un botón para salir tú mismo.
+          </li>
+          <li>
+            Pedir que borremos tu cuenta y todo lo asociado a ella, escribiendo a{' '}
+            <a href={`mailto:${CONTACT}`} className="link">
+              {CONTACT}
+            </a>
+            .
+          </li>
+        </ul>
+
+        <p>
+          Al borrar tu cuenta se elimina tu perfil, tus listas de deseos y tus promesas. Si
+          eras parte de un grupo ya sorteado, tu nombre deja de mostrarse.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2>Menores de edad</h2>
+        <p>
+          Dádiva no está dirigida a menores de 13 años y no recogemos datos de forma consciente
+          de personas de esa edad.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2>Cambios</h2>
+        <p>
+          Si esta política cambia, actualizaremos la fecha del encabezado. Los cambios de fondo
+          se avisarán dentro de la aplicación.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2>Contacto</h2>
+        <p>
+          Cualquier duda o solicitud sobre tus datos:{' '}
           <a href={`mailto:${CONTACT}`} className="link">
             {CONTACT}
           </a>
-          . Todavía no hay un botón para salir tú mismo.
-        </li>
-        <li>
-          Pedir que borremos tu cuenta y todo lo asociado a ella, escribiendo a{' '}
-          <a href={`mailto:${CONTACT}`} className="link">
-            {CONTACT}
-          </a>
-          .
-        </li>
-      </ul>
-
-      <p>
-        Al borrar tu cuenta se elimina tu perfil, tus listas de deseos y tus promesas. Si
-        eras parte de un grupo ya sorteado, tu nombre deja de mostrarse.
-      </p>
-    </section>
-
-    <section className="flex flex-col gap-3">
-      <h2>Menores de edad</h2>
-      <p>
-        Dádiva no está dirigida a menores de 13 años y no recogemos datos de forma consciente
-        de personas de esa edad.
-      </p>
-    </section>
-
-    <section className="flex flex-col gap-3">
-      <h2>Cambios</h2>
-      <p>
-        Si esta política cambia, actualizaremos la fecha del encabezado. Los cambios de fondo
-        se avisarán dentro de la aplicación.
-      </p>
-    </section>
-
-    <section className="flex flex-col gap-3">
-      <h2>Contacto</h2>
-      <p>
-        Cualquier duda o solicitud sobre tus datos:{' '}
-        <a href={`mailto:${CONTACT}`} className="link">
-          {CONTACT}
-        </a>
-      </p>
-    </section>
-  </LegalLayout>
-)
+        </p>
+      </section>
+    </LegalLayout>
+  )
+}

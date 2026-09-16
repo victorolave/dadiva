@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import { isSafeReturnPath, rememberReturnTo } from '../routes/returnTo'
+import { usePageMeta } from '../seo/usePageMeta'
 import { useEntranceAnimation } from '@animations'
 import { Alert, Button, GoogleMark, Sticker, VisibilityNote } from '@ui/atoms'
 import { Blob, Isotipo } from '@ui/brand'
@@ -17,6 +18,12 @@ import { Blob, Isotipo } from '@ui/brand'
  * costó una tarde de depuración. Se reactiva el día que haya dominio.
  */
 export const SignInPage = () => {
+  usePageMeta({
+    title: 'Entrar · Dádiva',
+    description: 'Entra a Dádiva con tu cuenta de Google para organizar o unirte a un amigo secreto.',
+    canonicalPath: '/entrar',
+  })
+
   const { user, status, signInWithGoogle } = useAuth()
   const [error, setError] = useState<string | null>(null)
   const [isRedirecting, setIsRedirecting] = useState(false)

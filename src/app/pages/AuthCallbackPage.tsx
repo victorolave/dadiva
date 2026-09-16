@@ -4,6 +4,7 @@ import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import { Alert, LinkButton, Skeleton, Sticker } from '@ui/atoms'
 import { Isotipo } from '@ui/brand'
 import { clearReturnTo, readReturnTo } from '../routes/returnTo'
+import { usePageMeta } from '../seo/usePageMeta'
 
 /** Traduce los códigos de error que Supabase devuelve en la URL. */
 const ERROR_MESSAGES: Record<string, string> = {
@@ -47,6 +48,11 @@ const readErrorFromUrl = (): CallbackError | null => {
  * que un fallo ruidoso, porque no se puede diagnosticar.
  */
 export const AuthCallbackPage = () => {
+  // Sin descripción ni canonical: es una pantalla de tránsito, nadie llega
+  // a ella desde un buscador (y va con `X-Robots-Tag: noindex`, ver
+  // vercel.json).
+  usePageMeta({ title: 'Entrando… · Dádiva' })
+
   const { status, user } = useAuth()
   const navigate = useNavigate()
   const [timedOut, setTimedOut] = useState(false)

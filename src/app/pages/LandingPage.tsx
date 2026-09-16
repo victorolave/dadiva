@@ -2,6 +2,7 @@ import { Gift, Sparkles, Users } from 'lucide-react'
 import { useEntranceAnimation, useScrollReveal } from '@animations'
 import { LinkButton, Sticker } from '@ui/atoms'
 import { Blob } from '@ui/brand'
+import { usePageMeta } from '../seo/usePageMeta'
 import { HeroCollage } from './landing/HeroCollage'
 import { TrustStrip } from './landing/TrustStrip'
 import { FeatureShowcase } from './landing/FeatureShowcase'
@@ -32,6 +33,15 @@ const STEPS = [
 ]
 
 export const LandingPage = () => {
+  usePageMeta({
+    title: 'Dádiva · Amigo secreto con promesas',
+    // La misma descripción que ya trae `index.html`: es la portada, y esa
+    // meta estática es la que leen los scrapers que no ejecutan JS.
+    description:
+      'Organiza tu amigo secreto y recibe una promesa bíblica para acompañar tu regalo. Toda buena dádiva desciende de lo alto.',
+    canonicalPath: '/',
+  })
+
   const heroRef = useEntranceAnimation<HTMLElement>({ stagger: 0.09 })
   const stepsRef = useScrollReveal<HTMLElement>()
 

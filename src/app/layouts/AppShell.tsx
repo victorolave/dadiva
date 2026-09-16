@@ -1,9 +1,11 @@
+import { useRef } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { Heart, LogOut } from 'lucide-react'
 import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import { Avatar, Button } from '@ui/atoms'
 import { BRAND_TAGLINE, BrandLogo, Isotipo } from '@ui/brand'
 import { cn } from '@ui/utils/cn'
+import { RouteAnnouncer } from '../seo/RouteAnnouncer'
 
 /**
  * Esqueleto de la app.
@@ -14,12 +16,15 @@ import { cn } from '@ui/utils/cn'
  */
 export const AppShell = () => {
   const { user, signOut } = useAuth()
+  const mainRef = useRef<HTMLElement>(null)
 
   return (
     // `overflow-x-clip`, no `overflow-hidden`: con `hidden` el contenedor
     // deja de ser el "viewport de scroll" del documento y el header
     // `sticky` de abajo se rompe. `clip` recorta sin tocar el scroll.
     <div className="flex min-h-svh flex-col overflow-x-clip">
+      <RouteAnnouncer mainRef={mainRef} />
+
       <a
         href="#contenido"
         className={cn(
@@ -82,7 +87,17 @@ export const AppShell = () => {
         </div>
       </header>
 
-      <main id="contenido" className="mx-auto w-full max-w-wide flex-1 px-page py-10 sm:py-16">
+      {/* `tabIndex={-1}`: no entra al orden de tabulación con Tab, solo
+          recibe foco por programa al navegar (ver RouteAnnouncer).
+          `focus:outline-none` apaga SOLO aquí el contorno de la regla global
+          de `:focus-visible` (theme.css) — main no es un control real, así
+          que su borde de foco no aporta nada y sí llama la atención de más. */}
+      <main
+        id="contenido"
+        ref={mainRef}
+        tabIndex={-1}
+        className="mx-auto w-full max-w-wide flex-1 px-page py-10 focus:outline-none sm:py-16"
+      >
         <Outlet />
       </main>
 
@@ -111,11 +126,14 @@ export const AppShell = () => {
               por
               {/* Pestaña nueva: es un sitio aparte, y quien está en medio de
                   un sorteo no debería perder la página del grupo. */}
+              {/* `inline-block py-1 -my-1`: agranda el área táctil vertical
+                  (WCAG 2.5.8) sin correr el texto de sitio, el `-my-1`
+                  compensa el `py-1` para que el layout no se mueva. */}
               <a
                 href="https://victorolave.dev/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="link font-bold text-ink"
+                className="link inline-block -my-1 py-1 font-bold text-ink"
               >
                 Victor Olave
                 <span className="sr-only"> (se abre en una pestaña nueva)</span>
@@ -124,10 +142,10 @@ export const AppShell = () => {
 
             <div className="flex items-center gap-4">
               <nav aria-label="Legal" className="flex items-center gap-4">
-                <Link to="/privacidad" className="link font-bold">
+                <Link to="/privacidad" className="link inline-block -my-1 py-1 font-bold">
                   Privacidad
                 </Link>
-                <Link to="/terminos" className="link font-bold">
+                <Link to="/terminos" className="link inline-block -my-1 py-1 font-bold">
                   Términos
                 </Link>
               </nav>

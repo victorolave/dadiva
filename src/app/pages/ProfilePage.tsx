@@ -4,10 +4,13 @@ import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import { Alert, Avatar, Button, Sticker, TextField } from '@ui/atoms'
 import { cn } from '@ui/utils/cn'
 import { isSafeReturnPath } from '../routes/returnTo'
+import { usePageMeta } from '../seo/usePageMeta'
 
 const EMOJI_OPTIONS = ['🎁', '🌷', '✨', '🕊️', '🌻', '💛', '🍀', '🌈', '☕', '📖', '🧁', '🫶'] as const
 
 export const ProfilePage = () => {
+  usePageMeta({ title: 'Tu perfil · Dádiva' })
+
   const { user, completeProfile } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
