@@ -18,7 +18,7 @@ import { PromiseCardBack, PromiseCardFace } from './PromiseCardFace'
 /** Cuántos dorsos mostramos en el abanico. Suficiente para sentir un mazo. */
 const DECK_SIZE = 9
 
-type DeckPhase = 'closed' | 'spreading' | 'choosing' | 'revealing' | 'revealed'
+type DeckPhase = 'closed' | 'choosing' | 'revealing' | 'revealed'
 
 export interface PromiseDeckProps {
   /** Promesa ya sacada. Si viene, se presenta directamente sin ritual. */
@@ -83,17 +83,22 @@ export const PromiseDeck = ({ savedCard, highlight = [], onDraw, isBusy = false 
     }
   }, [phase])
 
-  const handleOpen = useCallback(async () => {
+  const handleOpen = useCallback(() => {
     if (phase !== 'closed') return
 
-    setPhase('spreading')
     idleTween.current?.kill()
 
-    const cards = cardRefs.current.filter((card): card is HTMLButtonElement => card !== null)
-    const geometry = geometryForWidth(window.innerWidth)
-
-    await spreadDeck(cards, geometry)
+    // La interactividad NO espera a que termine la animación.
+    //
+    // Si esperáramos al `await spreadDeck(...)`, un tween que se demore, se
+    // interrumpa o falle dejaría las cartas muertas para siempre. La animación
+    // es decoración; el mazo tiene que responder aunque ella no ocurra. Además
+    // se siente mejor: puedes tomar una carta mientras todavía se abre, igual
+    // que con un mazo de verdad.
     setPhase('choosing')
+
+    const cards = cardRefs.current.filter((card): card is HTMLButtonElement => card !== null)
+    void spreadDeck(cards, geometryForWidth(window.innerWidth))
 
     // El foco va a la carta del centro para que quien usa teclado sepa
     // inmediatamente dónde está parado.
@@ -252,7 +257,7 @@ export const PromiseDeck = ({ savedCard, highlight = [], onDraw, isBusy = false 
 
       {phase === 'closed' && (
         <div className="flex flex-col items-center gap-3 text-center">
-          <Button size="lg" onClick={() => void handleOpen()} isLoading={isBusy}>
+          <Button size="lg" onClick={handleOpen} isLoading={isBusy}>
             Abrir el mazo
           </Button>
           <p className="max-w-xs text-sm text-ink-soft">
