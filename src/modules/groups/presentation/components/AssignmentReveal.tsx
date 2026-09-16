@@ -1,7 +1,8 @@
 import { useCallback, useRef, useState } from 'react'
 import { ExternalLink } from 'lucide-react'
-import { revealAssignment, paperConfetti } from '@animations'
-import { Button, Sticker } from '@ui/atoms'
+import { paperConfetti } from '@animations'
+import { ScratchReveal } from '@ui/molecules/ScratchReveal'
+import { Sticker } from '@ui/atoms'
 import type { MyAssignment } from '../../domain/repositories/AssignmentRepository'
 
 export interface AssignmentRevealProps {
@@ -9,191 +10,87 @@ export interface AssignmentRevealProps {
   readonly onReveal: () => void
 }
 
+/** Panel con el nombre. Es lo que queda debajo de la capa que se raspa. */
+const ReceiverPanel = ({ assignment }: { readonly assignment: MyAssignment }) => (
+  <div className="flex h-44 flex-col items-center justify-center gap-2 bg-blush-100 px-6 text-center">
+    <p className="label-mono text-ink-soft">Tu amigo secreto es</p>
+    <p className="flex flex-wrap items-center justify-center gap-2 text-display-md">
+      <span aria-hidden="true">{assignment.receiverAvatarEmoji}</span>
+      {assignment.receiverName}
+    </p>
+  </div>
+)
+
 /**
- * El sobre con el nombre del amigo secreto.
+ * Descubrir a quién le regalas.
  *
- * Si la persona ya lo abrió antes (`revealedAt`), no repetimos el ritual: se
- * muestra directo. La sorpresa ocurre una sola vez y volver a "abrirlo" cada
- * visita la abarataría.
+ * Se raspa una capa para revelar el nombre. Se eligió sobre la metáfora del
+ * sobre porque el gesto es táctil de verdad: en el móvil se hace con el pulgar
+ * y el nombre aparece donde pasa el dedo, no tras una animación que uno mira
+ * pasivamente.
+ *
+ * Si la persona ya lo descubrió antes (`revealedAt`), no se vuelve a cubrir:
+ * la sorpresa ocurre una sola vez y repetirla cada visita la abarataría.
  */
 export const AssignmentReveal = ({ assignment, onReveal }: AssignmentRevealProps) => {
   const [isOpen, setIsOpen] = useState(assignment.revealedAt !== null)
-  const [isAnimating, setIsAnimating] = useState(false)
+  const stageRef = useRef<HTMLDivElement>(null)
 
-  const envelopeRef = useRef<HTMLDivElement>(null)
-  const flapRef = useRef<HTMLDivElement>(null)
-  const slipRef = useRef<HTMLDivElement>(null)
-  const nameRef = useRef<HTMLParagraphElement>(null)
-
-  const handleOpen = useCallback(async () => {
-    const envelope = envelopeRef.current
-    const flap = flapRef.current
-    const slip = slipRef.current
-    const name = nameRef.current
-    if (!envelope || !flap || !slip || !name) return
-
-    setIsAnimating(true)
+  const handleRevealed = useCallback(() => {
     onReveal()
-
-    await revealAssignment(envelope, flap, slip, name)
-
-    if (envelope.parentElement) paperConfetti(envelope.parentElement, 30)
     setIsOpen(true)
-    setIsAnimating(false)
+    if (stageRef.current) paperConfetti(stageRef.current, 34)
   }, [onReveal])
 
-  if (isOpen && !isAnimating) {
-    return (
-      <Sticker tone="blush" className="flex flex-col gap-4 p-6">
-        <p className="label-mono text-ink-soft">Tu amigo secreto es</p>
-
-        <p className="flex items-center gap-3 text-display-md">
-          <span aria-hidden="true">{assignment.receiverAvatarEmoji}</span>
-          {assignment.receiverName}
-        </p>
-
-        {assignment.wishlist.length > 0 ? (
-          <div className="flex flex-col gap-2">
-            <h3 className="label-mono text-ink-soft">Lo que le gustaría</h3>
-            <ul className="flex flex-col gap-2">
-              {assignment.wishlist.map((item, index) => (
-                <li
-                  key={`${item.title}-${index}`}
-                  className="rounded-sticker border-2 border-ink/15 bg-paper px-3 py-2"
-                >
-                  <p className="font-medium">{item.title}</p>
-                  {item.notes && <p className="text-sm text-ink-soft">{item.notes}</p>}
-                  {item.url && (
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-1 inline-flex items-center gap-1 text-sm text-lilac-900 underline"
-                    >
-                      Ver enlace
-                      <ExternalLink className="size-3.5" aria-hidden="true" />
-                      <span className="sr-only">(se abre en una pestaña nueva)</span>
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <p className="text-sm text-ink-soft">
-            Todavía no escribió su lista de deseos. Puedes sorprenderle igual.
-          </p>
-        )}
-      </Sticker>
-    )
-  }
-
   return (
-    <div className="relative flex flex-col items-center gap-6 overflow-hidden py-4">
-      {/*
-        Sobre de cuatro paneles.
-        La versión anterior era un rectángulo con una solapa encima: leía como
-        una mancha, no como papel plegado. Aquí el rectángulo se divide en
-        cuatro triángulos que se encuentran en un punto por debajo del centro
-        (150,124 sobre un lienzo de 300x200), cada uno con un tono distinto.
-        La profundidad la dan los tonos, no los sombreados: exactamente el
-        recurso de los sobres plegados de papel.
+    <div ref={stageRef} className="relative overflow-hidden">
+      {isOpen ? (
+        <Sticker tone="blush" className="flex flex-col gap-4 overflow-hidden">
+          <ReceiverPanel assignment={assignment} />
 
-        Capas, de atrás hacia adelante:
-          1. interior — el fondo claro que se ve al abrirse
-          2. nota     — sale por la abertura superior
-          3. paneles  — laterales y base, tapan el pie de la nota
-          4. solapa   — gira sobre su borde superior
-      */}
-      <div
-        ref={envelopeRef}
-        // drop-shadow y no box-shadow: box-shadow dibujaría la sombra del
-        // rectángulo contenedor, no la de los triángulos. drop-shadow sigue el
-        // contorno real del SVG, que es lo que hace juego con las calcomanías
-        // del resto de la app.
-        className="relative aspect-[3/2] w-full max-w-xs drop-shadow-[4px_4px_0_var(--color-ink)]"
-        style={{ perspective: '1100px' }}
-      >
-        {/* 1 · interior */}
-        <svg viewBox="0 0 300 200" className="absolute inset-0 size-full" aria-hidden="true">
-          <rect
-            x="1.25"
-            y="1.25"
-            width="297.5"
-            height="197.5"
-            rx="14"
-            className="fill-apricot-100 stroke-ink"
-            strokeWidth="2.5"
-          />
-        </svg>
-
-        {/* 2 · la nota con el nombre */}
-        <div
-          ref={slipRef}
-          className="absolute inset-x-6 top-[6%] z-10 rounded-sticker border-2 border-ink bg-paper px-4 py-2.5 text-center opacity-0"
+          <div className="flex flex-col gap-2 px-6 pb-6">
+            {assignment.wishlist.length > 0 ? (
+              <>
+                <h3 className="label-mono text-ink-soft">Lo que le gustaría</h3>
+                <ul className="flex flex-col gap-2">
+                  {assignment.wishlist.map((item, index) => (
+                    <li
+                      key={`${item.title}-${index}`}
+                      className="rounded-sticker border-2 border-ink/15 bg-paper px-3 py-2"
+                    >
+                      <p className="font-medium">{item.title}</p>
+                      {item.notes && <p className="text-sm text-ink-soft">{item.notes}</p>}
+                      {item.url && (
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-1 inline-flex items-center gap-1 text-sm text-lilac-900 underline"
+                        >
+                          Ver enlace
+                          <ExternalLink className="size-3.5" aria-hidden="true" />
+                          <span className="sr-only">(se abre en una pestaña nueva)</span>
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p className="text-sm text-ink-soft">
+                Todavía no escribió su lista de deseos. Puedes sorprenderle igual.
+              </p>
+            )}
+          </div>
+        </Sticker>
+      ) : (
+        <ScratchReveal
+          onRevealed={handleRevealed}
+          className="w-full max-w-sm border-2 border-ink shadow-sticker-lg"
         >
-          <p className="label-mono text-ink-faint">Te tocó</p>
-          <p ref={nameRef} className="mt-1 font-display text-2xl leading-tight opacity-0">
-            {assignment.receiverAvatarEmoji} {assignment.receiverName}
-          </p>
-        </div>
-
-        {/* 3 · paneles laterales y base */}
-        <svg
-          viewBox="0 0 300 200"
-          className="pointer-events-none absolute inset-0 z-20 size-full"
-          aria-hidden="true"
-        >
-          <g className="stroke-ink" strokeWidth="2.5" strokeLinejoin="round">
-            <path
-              d="M1.25 15 Q1.25 1.25 15 1.25 L150 124 L15 198.75 Q1.25 198.75 1.25 185 Z"
-              className="fill-apricot-500"
-            />
-            <path
-              d="M298.75 15 Q298.75 1.25 285 1.25 L150 124 L285 198.75 Q298.75 198.75 298.75 185 Z"
-              className="fill-apricot-500"
-            />
-            <path
-              d="M1.25 185 Q1.25 198.75 15 198.75 L285 198.75 Q298.75 198.75 298.75 185 L150 124 Z"
-              className="fill-apricot-600"
-            />
-          </g>
-        </svg>
-
-        {/* 4 · solapa */}
-        <div
-          ref={flapRef}
-          aria-hidden="true"
-          className="absolute inset-0 z-30 origin-top"
-          style={{ transformStyle: 'preserve-3d' }}
-        >
-          <svg viewBox="0 0 300 200" className="size-full overflow-visible">
-            <path
-              d="M1.25 15 Q1.25 1.25 15 1.25 L285 1.25 Q298.75 1.25 298.75 15 L150 124 Z"
-              className="fill-apricot-300 stroke-ink"
-              strokeWidth="2.5"
-              strokeLinejoin="round"
-            />
-            {/* Sello sobre la punta: refuerza la lectura de «cerrado» y se
-                levanta junto con la solapa. */}
-            <circle cx="150" cy="104" r="14" className="fill-blush-500 stroke-ink" strokeWidth="2.5" />
-            <text
-              x="150"
-              y="104"
-              textAnchor="middle"
-              dominantBaseline="central"
-              className="fill-ink font-display"
-              fontSize="15"
-            >
-              D
-            </text>
-          </svg>
-        </div>
-      </div>
-
-      <Button size="lg" onClick={() => void handleOpen()} isLoading={isAnimating}>
-        Abrir mi sobre
-      </Button>
+          <ReceiverPanel assignment={assignment} />
+        </ScratchReveal>
+      )}
     </div>
   )
 }
