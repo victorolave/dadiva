@@ -12,7 +12,8 @@
     "lint": "oxlint",
     "typecheck": "tsc -b --noEmit",
     "check": "pnpm typecheck && pnpm lint && pnpm test",
-    "db:types": "supabase gen types typescript --local > src/core/infrastructure/supabase/database.types.ts"
+    "db:types": "supabase gen types typescript --local > src/core/infrastructure/supabase/database.types.ts",
+    "brand:assets": "bash scripts/brand-assets.sh"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

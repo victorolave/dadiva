@@ -26,10 +26,15 @@ const FieldShell = ({ label, hint, error, required, children }: FieldShellProps)
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={inputId} className="label-mono text-ink-soft">
+      {/* Tipografía normal, no mayúsculas en mono: un label de formulario
+          en versalitas comprimidas se lee peor que uno en texto corriente,
+          justo donde la lectura tiene que ser rápida y sin esfuerzo. */}
+      <label htmlFor={inputId} className="text-sm font-bold text-ink">
         {label}
         {required && (
-          <span className="ml-1 text-blush-700" aria-hidden="true">
+          // blush-900, no blush-700: blush-700 sobre blush-100 da 3.05 de
+          // contraste (no pasa AA). blush-900 da 6.11.
+          <span className="ml-1 text-blush-900" aria-hidden="true">
             *
           </span>
         )}
@@ -38,13 +43,13 @@ const FieldShell = ({ label, hint, error, required, children }: FieldShellProps)
       {children({ inputId, describedBy: describedBy || undefined })}
 
       {hint && !error && (
-        <p id={hintId} className="text-xs text-ink-faint">
+        <p id={hintId} className="text-sm text-ink-soft">
           {hint}
         </p>
       )}
 
       {error && (
-        <p id={errorId} role="alert" className="text-xs font-medium text-danger">
+        <p id={errorId} role="alert" className="text-sm font-bold text-danger">
           {error}
         </p>
       )}
@@ -54,13 +59,17 @@ const FieldShell = ({ label, hint, error, required, children }: FieldShellProps)
 
 const controlClasses = (hasError: boolean) =>
   cn(
-    'w-full rounded-sticker border-2 bg-paper px-3.5 py-2.5 font-sans text-base text-ink',
+    'h-12 w-full rounded-control border-2 bg-paper px-3.5 font-sans text-base text-ink',
     'placeholder:text-ink-faint',
-    'transition-shadow duration-150',
+    'transition-shadow duration-120',
     hasError
-      ? 'border-danger shadow-[3px_3px_0_0_var(--color-danger)]'
-      : 'border-ink shadow-sticker focus:shadow-sticker-lg',
+      ? 'border-danger bg-danger-soft shadow-[2px_2px_0_0_var(--color-danger)]'
+      : 'border-ink shadow-sticker-sm focus-visible:shadow-sticker',
   )
+
+// El textarea no lleva la altura fija de un input de una línea: reemplaza
+// `h-12` por relleno vertical propio para que crezca con `rows`.
+const textAreaClasses = 'h-auto py-3'
 
 export interface TextFieldProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'id' | 'aria-describedby'> {
@@ -109,7 +118,7 @@ export const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>
             aria-invalid={error ? true : undefined}
             required={required}
             rows={3}
-            className={cn(controlClasses(Boolean(error)), 'resize-y', className)}
+            className={cn(controlClasses(Boolean(error)), textAreaClasses, 'resize-y', className)}
             {...rest}
           />
         )}

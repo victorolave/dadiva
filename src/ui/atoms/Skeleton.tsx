@@ -13,7 +13,7 @@ export const Skeleton = ({ className }: SkeletonProps) => (
   <div
     aria-hidden="true"
     className={cn(
-      'animate-pulse rounded-sticker border-2 border-ink/15 bg-paper-shade motion-reduce:animate-none',
+      'animate-pulse rounded-control border-2 border-ink/15 bg-paper-shade motion-reduce:animate-none',
       className,
     )}
   />

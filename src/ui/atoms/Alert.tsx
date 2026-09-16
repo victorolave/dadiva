@@ -28,7 +28,7 @@ export const Alert = ({ tone = 'info', title, children, className }: AlertProps)
   return (
     <div
       role={tone === 'error' ? 'alert' : 'status'}
-      className={cn('flex gap-3 rounded-sticker border-2 px-4 py-3', styles, className)}
+      className={cn('flex gap-3 rounded-control border-2 px-4 py-3', styles, className)}
     >
       <Icon className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
       <div className="text-sm leading-relaxed">

@@ -5,6 +5,23 @@
    Estética: cuaderno de apuntes. Papel crema cuadriculado, tinta negra,
    acentos pastel femeninos, bordes marcados y sombras sólidas desplazadas
    (como una calcomanía pegada en la hoja).
+
+   Reglas de color (medidas con la misma fórmula de contraste que usa el
+   test del catálogo de promesas):
+   1. Texto sobre pastel = SIEMPRE `ink`, nunca blanco. Sobre un relleno
+      -500 no se permite `ink-soft` (ratio 4.14, no pasa AA); sobre -300 o
+      -100 sí (ratio ≥ 4.87).
+   2. Proporción de color por pantalla ≈ 70% papel / 20% blush+lilac / 10%
+      tinta. Máximo tres tonos de apoyo por pantalla (blush y lilac
+      cuentan). El contenido de las cartas de promesa no cuenta para este
+      límite: cada carta es su propio universo de color.
+   3. Blush es la acción primaria, la selección y el afecto. Lilac es
+      identidad: navegación activa, cubierta del raspado, reverso de las
+      cartas, blobs. Apricot es organizar y el tiempo: sorteo, cuenta
+      regresiva, "Organiza". Sage y sky solo aparecen en la landing o como
+      garabato decorativo.
+   4. `ink-faint` no pasa AA ni siquiera sobre `paper` (ratio 3.56): solo
+      placeholder y bordes deshabilitados, nunca texto que haya que leer.
    ------------------------------------------------------------------ */
 
 @theme {
@@ -54,32 +71,81 @@
   /* --- Semánticos --- */
   --color-danger: #b3261e;
   --color-danger-soft: #fdecea;
+  /* Hover del botón de peligro: un paso más oscuro que danger-soft, igual
+     que el resto de variantes se oscurecen en vez de invertir a color sólido. */
+  --color-danger-soft-hover: #f9d6d2;
   --color-success: #3d6b3a;
   --color-success-soft: #e9f3e7;
 
   /* --- Tipografía --- */
   --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
-  --font-sans: 'DM Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: 'Nunito Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: 'DM Mono', ui-monospace, 'SFMono-Regular', monospace;
   --font-script: 'Caveat', 'Bradley Hand', cursive;
 
-  --text-display-xl: clamp(2.75rem, 9vw, 5.5rem);
-  --text-display-lg: clamp(2.25rem, 6.5vw, 4rem);
-  --text-display-md: clamp(1.75rem, 4.5vw, 2.75rem);
-  --text-display-sm: clamp(1.375rem, 3.2vw, 1.875rem);
+  /* Escala editorial. Cada token trae su propia línea/tracking porque un
+     tamaño de fuente aislado no define jerarquía: la relación entre
+     tamaño y line-height es la que hace que un h1 "se sienta" h1. */
+  --text-display: clamp(2.5rem, 3.2vw + 1.75rem, 3.5rem);
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.01em;
+  --text-h1: clamp(2rem, 2vw + 1.5rem, 2.75rem);
+  --text-h1--line-height: 1.12;
+  --text-h1--letter-spacing: -0.01em;
+  --text-h2: clamp(1.625rem, 1.2vw + 1.3125rem, 2rem);
+  --text-h2--line-height: 1.18;
+  --text-h3: clamp(1.25rem, 0.6vw + 1.125rem, 1.5rem);
+  --text-h3--line-height: 1.25;
+  /* Explícito en 0: sin esto heredaría el -0.01em de la regla base
+     h1-h4 y el DS pide los títulos más chicos sin tracking negativo. */
+  --text-h3--letter-spacing: 0em;
+  --text-lead: clamp(1.125rem, 0.3vw + 1.0625rem, 1.25rem);
+  --text-lead--line-height: 1.5;
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1.4;
+  --text-eyebrow--letter-spacing: 0.14em;
+  /* Código de grupo (JoinGroupPage, InviteCodeCard): ancho generoso para
+     que se lea como un ticket, con tracking amplio típico de un código. */
+  --text-code: clamp(1.75rem, 2vw + 1.25rem, 2.5rem);
+  --text-code--letter-spacing: 0.14em;
+  --text-verse: clamp(1.375rem, 1.4vw + 1.0625rem, 1.875rem);
+  --text-verse--line-height: 1.3;
+
+  /* --- Espacio --- */
+  /* Padding lateral fluido: header, main y footer lo comparten para que
+     el contenido quede siempre alineado sin importar el viewport. */
+  --spacing-page: clamp(1rem, 4vw, 3rem);
+
+  /* --- Contenedores con nombre --- */
+  /* Reemplazan max-w-md/xl/2xl/5xl "genéricos" de Tailwind por anchos que
+     dicen para qué son: una pantalla de acción angosta no es lo mismo que
+     un formulario, y un formulario no es lo mismo que texto largo. */
+  --container-narrow: 30rem;
+  --container-form: 35rem;
+  --container-reading: 40rem;
+  --container-wide: 60rem;
+  --container-page: 75rem;
 
   /* --- Radios --- */
-  --radius-sticker: 0.875rem;
-  --radius-card: 1.25rem;
+  --radius-control: 0.75rem;
+  --radius-tile: 1rem;
+  --radius-card: 1.5rem;
+  --radius-hero: 1.875rem;
   --radius-pill: 999px;
 
   /* --- Sombras sólidas (sin blur, estética plana) --- */
-  --shadow-sticker: 3px 3px 0 0 var(--color-ink);
-  --shadow-sticker-lg: 5px 5px 0 0 var(--color-ink);
-  --shadow-lifted: 8px 8px 0 0 var(--color-ink);
+  --shadow-sticker-sm: 2px 2px 0 0 var(--color-ink);
+  --shadow-sticker: 4px 4px 0 0 var(--color-ink);
+  --shadow-sticker-lg: 6px 6px 0 0 var(--color-ink);
+  /* Solo para momentos de celebración (carta revelada). No afectan layout:
+     mismo desplazamiento que shadow-sticker, distinto color. */
+  --shadow-celebrate: 4px 4px 0 0 var(--color-blush-700);
+  --shadow-celebrate-lilac: 4px 4px 0 0 var(--color-lilac-700);
 
   /* --- Animación --- */
   --ease-paper: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {
@@ -98,6 +164,9 @@
     background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    /* Cuerpo fluido: 16px en móvil, 18px en desktop, sin escalón brusco. */
+    font-size: clamp(1rem, 0.2vw + 0.9375rem, 1.125rem);
+    line-height: 1.5;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -114,7 +183,7 @@
     background-image:
       linear-gradient(to right, var(--color-grid) 1px, transparent 1px),
       linear-gradient(to bottom, var(--color-grid) 1px, transparent 1px);
-    background-size: 28px 28px;
+    background-size: 24px 24px;
     opacity: 0.55;
     mask-image: radial-gradient(ellipse 120% 90% at 50% 0%, #000 45%, transparent 100%);
   }
@@ -129,9 +198,10 @@
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     font-weight: 600;
-    font-variation-settings: 'SOFT' 40, 'WONK' 1, 'opsz' 40;
-    letter-spacing: -0.02em;
-    line-height: 1.04;
+    /* `font-variation-settings: 'SOFT'/'WONK'` no hacía nada: la hoja de
+       Google Fonts solo carga los ejes opsz,wght. Se quita: cero cambio
+       visual, un `@font-face` lookup menos por render. */
+    letter-spacing: -0.01em;
     text-wrap: balance;
   }
 
@@ -142,7 +212,7 @@
   /* Foco visible y consistente en todo el producto. */
   :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
     outline: 3px solid var(--color-lilac-700);
-    outline-offset: 2px;
+    outline-offset: 3px;
     border-radius: 4px;
   }
 
@@ -153,15 +223,6 @@
 }
 
 @layer utilities {
-  /* Etiqueta en versalitas con tracking, muy usada en la referencia visual. */
-  .label-mono {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    line-height: 1;
-  }
-
   /* Resaltado tipo marcador sobre una palabra. */
   .marker {
     background-image: linear-gradient(transparent 58%, var(--color-blush-300) 58%);
@@ -181,13 +242,36 @@
     background: color-mix(in oklab, var(--color-apricot-300) 85%, transparent);
     border-inline: 1px dashed color-mix(in oklab, var(--color-ink) 18%, transparent);
   }
+}
 
-  .paper-texture {
-    background-color: var(--color-paper);
-    background-image:
-      linear-gradient(to right, var(--color-grid) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--color-grid) 1px, transparent 1px);
-    background-size: 22px 22px;
+/* Etiqueta corta en mayúsculas: la voz del DS para "ENTRADA", "INVITACIÓN",
+   "REVELACIÓN"... `@utility` (no `@layer utilities`) porque así también
+   puede recibir modificadores de Tailwind (p.ej. `sm:eyebrow`) si algún día
+   hace falta. Reemplazó a `.label-mono` (retirada en el lote 4) como
+   encabezado/eyebrow; el mono queda solo para código o datos técnicos,
+   como el código de grupo en `JoinGroupPage`/`InviteCodeCard`. */
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--text-eyebrow);
+  line-height: var(--text-eyebrow--line-height);
+  letter-spacing: var(--text-eyebrow--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+/* Enlace de texto dentro de contenido (no botón). Centraliza color y
+   subrayado para no repetir "text-lilac-900 underline" a mano en cada
+   página; @utility (no @layer) porque necesita anidar el estado :hover. */
+@utility link {
+  color: var(--color-lilac-900);
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+
+  &:hover {
+    color: var(--color-ink);
+    text-decoration-color: var(--color-blush-500);
   }
 }
 
