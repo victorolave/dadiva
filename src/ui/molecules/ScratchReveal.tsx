@@ -232,16 +232,21 @@ export const ScratchReveal = ({
   }
 
   if (isRevealed) {
-    return (
-      <div className={cn('relative', className)}>
-        {children}
-      </div>
-    )
+    return <div className={cn('relative w-full', className)}>{children}</div>
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div ref={containerRef} className={cn('relative overflow-hidden rounded-card', className)}>
+    <div className="flex w-full flex-col items-center gap-4">
+      {/*
+        `w-full` es obligatorio aquí: el contenedor padre usa `items-center`,
+        que encoge a los hijos al ancho de su contenido. Sin esto la tarjeta
+        cubierta medía 363px y la revelada 384px, así que al raspar se
+        ensanchaba de golpe — justo lo que se quiso evitar.
+      */}
+      <div
+        ref={containerRef}
+        className={cn('relative w-full overflow-hidden rounded-card', className)}
+      >
         {/* `aria-hidden` mientras está cubierto: quien usa lector de pantalla
             no debe escuchar el nombre antes de pedir revelarlo. */}
         <div aria-hidden="true">{children}</div>
