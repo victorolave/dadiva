@@ -1,0 +1,6 @@
+export { gsap, useGSAP, DURATION, EASE, prefersReducedMotion } from './gsapSetup'
+export * from './presets/entrance'
+export * from './presets/cardDeck'
+export * from './presets/reveal'
+export { useEntranceAnimation } from './hooks/useEntranceAnimation'
+export { useScrollReveal } from './hooks/useScrollReveal'
