@@ -27,13 +27,9 @@ export const TermsPage = () => (
       <h2>Lo que esperamos de ti</h2>
       <p>
         Usa tu nombre real o uno que tu grupo reconozca. No publiques contenido ofensivo,
-        ilegal ni que acose a otra persona, ni en las descripciones de grupo, ni en las listas
-        de deseos, ni en los mensajes anónimos.
-      </p>
-      <p>
-        Los mensajes anónimos existen para hacer más divertido el juego, no para esconderse.
-        Si se usan para hostigar a alguien, podemos eliminar el contenido y la cuenta
-        responsable.
+        ilegal ni que acose a otra persona, ni en las descripciones de grupo ni en las listas
+        de deseos. Si usas la aplicación para hostigar a alguien, podemos eliminar el
+        contenido y la cuenta responsable.
       </p>
     </section>
 

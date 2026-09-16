@@ -39,7 +39,6 @@ export const PrivacyPage = () => (
         <li>Los grupos que creas: nombre, descripción, fecha del intercambio y presupuesto.</li>
         <li>Tu lista de deseos, si decides escribir una.</li>
         <li>La tarjeta de promesa que sacas en cada grupo.</li>
-        <li>Los mensajes anónimos que envías dentro de un grupo.</li>
         <li>A quién te tocó regalar, resultado del sorteo.</li>
       </ul>
 
@@ -56,7 +55,8 @@ export const PrivacyPage = () => (
 
       <p>
         Los demás miembros de un grupo ven tu nombre, tu emoji y tu lista de deseos. Eso es
-        justamente lo que hace funcionar el intercambio.
+        justamente lo que hace funcionar el intercambio. Cuando se hace el sorteo, además, le
+        mostramos tu lista de forma destacada a la persona a la que le toca regalarte.
       </p>
 
       <p>
@@ -65,11 +65,6 @@ export const PrivacyPage = () => (
         participantes, ni quien organiza el grupo. Esa restricción está aplicada en la base de
         datos mediante políticas de seguridad a nivel de fila, no solo escondida en la
         interfaz.
-      </p>
-
-      <p>
-        Los mensajes anónimos llegan a su destinatario sin revelar quién los escribió. La
-        base de datos no le entrega el remitente a quien los recibe.
       </p>
     </section>
 
@@ -91,7 +86,13 @@ export const PrivacyPage = () => (
       <ul className="flex flex-col gap-1.5">
         <li>Cambiar tu nombre visible y tu emoji desde tu perfil.</li>
         <li>Editar o borrar tu lista de deseos.</li>
-        <li>Salir de un grupo antes de que se haga el sorteo.</li>
+        <li>
+          Pedir que te saquemos de un grupo antes de que se haga el sorteo, escribiendo a{' '}
+          <a href={`mailto:${CONTACT}`} className="link">
+            {CONTACT}
+          </a>
+          . Todavía no hay un botón para salir tú mismo.
+        </li>
         <li>
           Pedir que borremos tu cuenta y todo lo asociado a ella, escribiendo a{' '}
           <a href={`mailto:${CONTACT}`} className="link">
@@ -102,8 +103,8 @@ export const PrivacyPage = () => (
       </ul>
 
       <p>
-        Al borrar tu cuenta se elimina tu perfil, tus listas de deseos, tus promesas y tus
-        mensajes. Si eras parte de un grupo ya sorteado, tu nombre deja de mostrarse.
+        Al borrar tu cuenta se elimina tu perfil, tus listas de deseos y tus promesas. Si
+        eras parte de un grupo ya sorteado, tu nombre deja de mostrarse.
       </p>
     </section>
 
