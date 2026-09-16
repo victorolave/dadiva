@@ -3,6 +3,12 @@ import { useEntranceAnimation, useScrollReveal } from '@animations'
 import { LinkButton, Sticker } from '@ui/atoms'
 import { Blob } from '@ui/brand'
 import { HeroCollage } from './landing/HeroCollage'
+import { TrustStrip } from './landing/TrustStrip'
+import { FeatureShowcase } from './landing/FeatureShowcase'
+import { UseCases } from './landing/UseCases'
+import { PrivacySection } from './landing/PrivacySection'
+import { Faq } from './landing/Faq'
+import { FinalCta } from './landing/FinalCta'
 
 const STEPS = [
   {
@@ -68,6 +74,8 @@ export const LandingPage = () => {
         <HeroCollage />
       </section>
 
+      <TrustStrip />
+
       <section ref={stepsRef} aria-labelledby="como-funciona" className="flex flex-col gap-8">
         <div className="text-center">
           <p className="eyebrow">Paso a paso</p>
@@ -100,7 +108,15 @@ export const LandingPage = () => {
         </ul>
       </section>
 
-      <section className="relative isolate flex justify-center">
+      <FeatureShowcase />
+
+      <UseCases />
+
+      <PrivacySection />
+
+      <Faq />
+
+      <section aria-label="Cierre" className="relative isolate flex justify-center">
         <Blob
           shape="a"
           tone="blush"
@@ -114,6 +130,8 @@ export const LandingPage = () => {
           <p className="eyebrow mt-4">2 Corintios 9:7</p>
         </Sticker>
       </section>
+
+      <FinalCta />
     </div>
   )
 }
