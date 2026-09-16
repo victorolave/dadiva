@@ -5,7 +5,7 @@
 -- Fuente: src/modules/promises/infrastructure/data/promiseCatalog.ts
 -- Regenerar con: npx tsx scripts/generate-promise-seed.ts
 --
--- 67 versículos · 12 variantes visuales
+-- 68 versículos · 12 variantes visuales
 --
 -- El ON CONFLICT hace UPDATE y no DO NOTHING a propósito: la migración 0004
 -- sembró 3 filas de ejemplo con theme_key inválidos ('gift', 'hope',
@@ -82,7 +82,8 @@ values
   ('Salmos 18:2', 'Jehová, roca mía y castillo mío, y mi libertador; Dios mío, fortaleza mía, en él confiaré; mi escudo, y la fuerza de mi salvación, mi alto refugio.', 'RVR1960', 'estrellas'),
   ('Isaías 41:13', 'Porque yo Jehová soy tu Dios, quien te sostiene de tu mano derecha, y te dice: No temas, yo te ayudo.', 'RVR1960', 'lunares'),
   ('Salmos 34:9-10', 'Temed a Jehová, vosotros sus santos, pues nada falta a los que le temen. Los leoncillos necesitan, y tienen hambre; pero los que buscan a Jehová no tendrán falta de ningún bien.', 'RVR1960', 'sol'),
-  ('1 Juan 3:1', 'Mirad cuál amor nos ha dado el Padre, para que seamos llamados hijos de Dios; por esto el mundo no nos conoce, porque no le conoció a él.', 'RVR1960', 'jardin')
+  ('1 Juan 3:1', 'Mirad cuál amor nos ha dado el Padre, para que seamos llamados hijos de Dios; por esto el mundo no nos conoce, porque no le conoció a él.', 'RVR1960', 'jardin'),
+  ('Proverbios 17:17', 'En todo tiempo ama el amigo, y es como un hermano en tiempo de angustia.', 'RVR1960', 'lunares')
 on conflict (reference, version) do update
   set text      = excluded.text,
       theme_key = excluded.theme_key;

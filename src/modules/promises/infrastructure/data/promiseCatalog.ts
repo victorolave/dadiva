@@ -651,4 +651,17 @@ export const PROMISE_CATALOG: readonly PromiseCardSeed[] = [
     highlight: ['Mirad cuál amor'],
     tone: 'amor',
   },
+  {
+    // Incorporado desde la semilla de ejemplo de la migración 0004, que lo
+    // sembró con un themeKey inexistente. En vez de borrar la fila huérfana
+    // se adopta el versículo: es el más literal de toda la app para un
+    // intercambio de amigo secreto.
+    id: 'proverbios-17-17',
+    reference: 'Proverbios 17:17',
+    text: 'En todo tiempo ama el amigo, y es como un hermano en tiempo de angustia.',
+    version: 'RVR1960',
+    themeKey: 'lunares',
+    highlight: ['ama el amigo'],
+    tone: 'amor',
+  },
 ];
