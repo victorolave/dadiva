@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ContainerProvider } from './composition/ContainerProvider'
+import { SetupGuard } from './SetupGuard'
 import { AuthProvider } from '@modules/auth/presentation/AuthProvider'
 import { AppShell } from './layouts/AppShell'
 import { ProtectedRoute } from './routes/ProtectedRoute'
@@ -51,7 +52,8 @@ const RouteFallback = () => (
  * a AuthProvider porque este consume el repositorio de autenticación de aquel.
  */
 export const App = () => (
-  <ContainerProvider>
+  <SetupGuard>
+    <ContainerProvider>
     <BrowserRouter>
       <AuthProvider>
         <Suspense fallback={<RouteFallback />}>
@@ -76,5 +78,6 @@ export const App = () => (
         </Suspense>
       </AuthProvider>
     </BrowserRouter>
-  </ContainerProvider>
+    </ContainerProvider>
+  </SetupGuard>
 )
