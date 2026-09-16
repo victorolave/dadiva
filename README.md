@@ -208,3 +208,21 @@ pnpm db:types    # regenerar tipos desde el esquema local
 ## Licencia
 
 MIT
+
+---
+
+## Despliegue
+
+La app es una SPA de Vite servida como estáticos en Vercel.
+
+> **La regla de reescritura de `vercel.json` no es opcional.** Sin ella, cualquier URL
+> que no sea `/` devuelve 404 al recargar — incluida `/entrar/confirmar`, que es
+> exactamente donde aterriza el retorno de Google OAuth. El login quedaría roto en
+> producción y funcionando en local, que es la peor combinación posible para depurar.
+
+Se usa `vercel.json` y no `vercel.ts` a propósito: esta configuración no tiene lógica
+dinámica ni lee variables de entorno, así que sumar la dependencia `@vercel/config`
+para cuatro reglas estáticas no compensa.
+
+Las variables `VITE_*` se resuelven **en tiempo de compilación**, no en ejecución. Deben
+existir en Vercel *antes* del build o el bundle saldrá sin ellas.

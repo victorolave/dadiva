@@ -37,6 +37,12 @@ const JoinGroupPage = lazy(() =>
 const GroupDetailPage = lazy(() =>
   import('./pages/GroupDetailPage').then((module) => ({ default: module.GroupDetailPage })),
 )
+const PrivacyPage = lazy(() =>
+  import('./pages/legal/PrivacyPage').then((module) => ({ default: module.PrivacyPage })),
+)
+const TermsPage = lazy(() =>
+  import('./pages/legal/TermsPage').then((module) => ({ default: module.TermsPage })),
+)
 
 const RouteFallback = () => (
   <div className="flex flex-col gap-4" aria-busy="true" aria-label="Cargando">
@@ -62,6 +68,8 @@ export const App = () => (
               <Route index element={<LandingPage />} />
               <Route path="entrar" element={<SignInPage />} />
               <Route path="entrar/confirmar" element={<AuthCallbackPage />} />
+              <Route path="privacidad" element={<PrivacyPage />} />
+              <Route path="terminos" element={<TermsPage />} />
 
               <Route element={<ProtectedRoute />}>
                 <Route path="perfil" element={<ProfilePage />} />

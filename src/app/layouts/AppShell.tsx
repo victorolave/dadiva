@@ -79,6 +79,15 @@ export const AppShell = () => {
             «Toda buena dádiva y todo don perfecto desciende de lo alto»
           </p>
           <p className="label-mono text-ink-faint">Santiago 1:17</p>
+
+          <nav aria-label="Legal" className="mt-3 flex justify-center gap-4">
+            <Link to="/privacidad" className="label-mono text-ink-faint underline">
+              Privacidad
+            </Link>
+            <Link to="/terminos" className="label-mono text-ink-faint underline">
+              Términos
+            </Link>
+          </nav>
         </div>
       </footer>
     </div>
