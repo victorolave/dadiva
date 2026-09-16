@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
-import { LogOut } from 'lucide-react'
+import { Heart, LogOut } from 'lucide-react'
 import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import { Avatar, Button } from '@ui/atoms'
 import { BRAND_TAGLINE, BrandLogo, Isotipo } from '@ui/brand'
@@ -87,29 +87,52 @@ export const AppShell = () => {
       </main>
 
       <footer className="border-t-2 border-ink bg-paper-deep">
-        <div className="mx-auto grid w-full max-w-wide gap-6 px-page py-10 sm:grid-cols-[auto_1fr] sm:items-center">
-          <div>
-            <BrandLogo variant="horizontal" />
-            {/* Tagline pendiente de aprobación de marca: src/ui/brand/tagline.ts. */}
-            <p className="mt-2 text-sm font-bold">{BRAND_TAGLINE}</p>
-          </div>
+        <div className="mx-auto w-full max-w-wide px-page">
+          <div className="grid gap-8 py-10 sm:grid-cols-[1fr_auto] sm:items-end sm:gap-12">
+            <div className="flex flex-col gap-3">
+              <BrandLogo variant="horizontal" />
+              {/* Tagline pendiente de aprobación de marca: src/ui/brand/tagline.ts. */}
+              <p className="max-w-xs text-sm font-bold">{BRAND_TAGLINE}</p>
+            </div>
 
-          <div className="flex flex-col gap-3 sm:items-end sm:text-right">
-            <div>
+            <blockquote className="max-w-md sm:text-right">
               <p className="font-display text-h3 text-ink">
                 «Toda buena dádiva y todo don perfecto desciende de lo alto.»
               </p>
-              <p className="eyebrow mt-1">Santiago 1:17</p>
-            </div>
+              <cite className="eyebrow mt-2 block not-italic">Santiago 1:17</cite>
+            </blockquote>
+          </div>
 
-            <nav aria-label="Legal" className="flex gap-4">
-              <Link to="/privacidad" className="link text-sm font-bold">
-                Privacidad
-              </Link>
-              <Link to="/terminos" className="link text-sm font-bold">
-                Términos
-              </Link>
-            </nav>
+          <div className="flex flex-col gap-4 border-t-2 border-dashed border-ink py-5 text-sm sm:flex-row sm:items-center sm:justify-between">
+            <p className="flex flex-wrap items-center gap-1.5 text-ink-soft">
+              Hecho con
+              <Heart className="size-4 fill-blush-500 text-ink" aria-hidden="true" />
+              <span className="sr-only">cariño</span>
+              por
+              {/* Pestaña nueva: es un sitio aparte, y quien está en medio de
+                  un sorteo no debería perder la página del grupo. */}
+              <a
+                href="https://victorolave.dev/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link font-bold text-ink"
+              >
+                Victor Olave
+                <span className="sr-only"> (se abre en una pestaña nueva)</span>
+              </a>
+            </p>
+
+            <div className="flex items-center gap-4">
+              <nav aria-label="Legal" className="flex items-center gap-4">
+                <Link to="/privacidad" className="link font-bold">
+                  Privacidad
+                </Link>
+                <Link to="/terminos" className="link font-bold">
+                  Términos
+                </Link>
+              </nav>
+              <span className="text-ink-soft">© {new Date().getFullYear()} Dádiva</span>
+            </div>
           </div>
         </div>
       </footer>
