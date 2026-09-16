@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import {
+  anchorCards,
   geometryForWidth,
   idleDeckPulse,
   liftCard,
   presentSavedCard,
   revealChosenCard,
   spreadDeck,
-  stackTransform,
   paperConfetti,
   prefersReducedMotion,
 } from '@animations'
@@ -49,6 +49,8 @@ export const PromiseDeck = ({ savedCard, highlight = [], onDraw, isBusy = false 
 
   const stageRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLButtonElement | null)[]>([])
+  // El botón lleva la posición del abanico; el hijo lleva el levantamiento.
+  const innerRefs = useRef<(HTMLDivElement | null)[]>([])
   const savedCardRef = useRef<HTMLDivElement>(null)
   const idleTween = useRef<gsap.core.Tween | null>(null)
 
@@ -65,6 +67,14 @@ export const PromiseDeck = ({ savedCard, highlight = [], onDraw, isBusy = false 
     if (phase !== 'revealed' || !savedCardRef.current) return
     presentSavedCard(savedCardRef.current)
   }, [phase, revealedCard])
+
+  // Ancla el centrado antes del primer pintado. Va en useLayoutEffect y no en
+  // useEffect porque con useEffect el navegador alcanza a pintar un fotograma
+  // con las cartas descentradas.
+  useLayoutEffect(() => {
+    const cards = cardRefs.current.filter((c): c is HTMLButtonElement => c !== null)
+    if (cards.length > 0) anchorCards(cards)
+  }, [phase])
 
   // Pulso de invitación mientras el mazo está cerrado.
   useEffect(() => {
@@ -193,8 +203,6 @@ export const PromiseDeck = ({ savedCard, highlight = [], onDraw, isBusy = false 
           className="relative size-full"
         >
           {Array.from({ length: DECK_SIZE }, (_, index) => {
-            const initial = stackTransform(index)
-
             return (
               <button
                 key={index}
@@ -228,9 +236,9 @@ export const PromiseDeck = ({ savedCard, highlight = [], onDraw, isBusy = false 
                   if (card && phase === 'choosing') liftCard(card, false)
                 }}
                 className={cn(
-                  'absolute left-1/2 top-1/2 w-[9.5rem] sm:w-[11.5rem]',
-                  '-translate-x-1/2 -translate-y-1/2 rounded-card',
-                  'transition-[filter] duration-200',
+                  // Sin `-translate-x-1/2`: el centrado lo pone GSAP con
+                  // xPercent/yPercent para no pelear por la misma propiedad.
+                  'absolute left-1/2 top-1/2 w-[8.5rem] rounded-card sm:w-[10rem]',
                   phase === 'choosing'
                     ? 'cursor-pointer focus-visible:outline-4'
                     : 'cursor-default',
@@ -238,17 +246,23 @@ export const PromiseDeck = ({ savedCard, highlight = [], onDraw, isBusy = false 
                 style={{
                   zIndex: DECK_SIZE - index,
                   transformStyle: 'preserve-3d',
-                  // El transform inicial lo pone GSAP en el primer frame; esto
-                  // evita el salto visual del montaje.
-                  translate: `${initial.x}px ${initial.y}px`,
-                  rotate: `${initial.rotate}deg`,
+                  // Invisible hasta que anchorCards la coloque, para que nunca
+                  // se vea un fotograma con la carta sin centrar.
+                  visibility: 'hidden',
                 }}
               >
-                {faceUp && revealedCard && index === chosenIndex ? (
-                  <PromiseCardFace card={revealedCard} highlight={highlight} />
-                ) : (
-                  <PromiseCardBack />
-                )}
+                <div
+                  ref={(node) => {
+                    innerRefs.current[index] = node
+                  }}
+                  className="will-change-transform"
+                >
+                  {faceUp && revealedCard && index === chosenIndex ? (
+                    <PromiseCardFace card={revealedCard} highlight={highlight} />
+                  ) : (
+                    <PromiseCardBack />
+                  )}
+                </div>
               </button>
             )
           })}

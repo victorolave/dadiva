@@ -29,6 +29,28 @@ export const geometryForWidth = (width: number): DeckGeometry => {
   return { spreadAngle: 64, radius: 310 }
 }
 
+/**
+ * Ancla cada carta por su CENTRO sobre el punto (50%, 50%) del escenario.
+ *
+ * Se hace con xPercent/yPercent de GSAP y NO con `-translate-x-1/2` de
+ * Tailwind: ambas escriben en la misma propiedad `transform`, y el primer
+ * tween de GSAP que toque `x` o `y` borraría las clases de Tailwind. El
+ * resultado era un abanico corrido media carta a la derecha y hacia abajo,
+ * cortado contra el borde inferior. GSAP compone xPercent con x sin pisarlo.
+ */
+export const anchorCards = (cards: readonly Element[]): void => {
+  cards.forEach((card, index) => {
+    // `autoAlpha: 1` revierte el `visibility: hidden` que el componente pone
+    // en línea: las cartas nacen ocultas y solo se muestran ya centradas.
+    gsap.set(card, {
+      xPercent: -50,
+      yPercent: -50,
+      autoAlpha: 1,
+      ...stackTransform(index),
+    })
+  })
+}
+
 /** Posición en reposo de cada carta dentro del mazo cerrado. */
 export const stackTransform = (index: number) => ({
   x: index * 0.6,
@@ -95,12 +117,19 @@ export const spreadDeck = (
   })
 }
 
-/** Levanta ligeramente una carta cuando recibe foco o el puntero encima. */
-export const liftCard = (card: Element, lifted: boolean): void => {
+/**
+ * Levanta ligeramente una carta cuando recibe foco o el puntero encima.
+ *
+ * Recibe el elemento INTERNO de la carta, no el botón. El botón lleva el
+ * transform del abanico (x, y, rotate) más el centrado (xPercent/yPercent);
+ * si el levantamiento tocara ese mismo transform, borraría el centrado y la
+ * carta saltaría media carta de posición. Dos responsabilidades, dos capas.
+ */
+export const liftCard = (cardInner: Element, lifted: boolean): void => {
   if (prefersReducedMotion()) return
 
-  gsap.to(card, {
-    yPercent: lifted ? -9 : 0,
+  gsap.to(cardInner, {
+    y: lifted ? -14 : 0,
     scale: lifted ? 1.05 : 1,
     duration: DURATION.fast,
     ease: EASE.paper,
@@ -122,7 +151,7 @@ export const revealChosenCard = (
   if (prefersReducedMotion()) {
     gsap.set(others, { autoAlpha: 0 })
     onFlipHalfway()
-    gsap.set(chosen, { x: 0, y: 0, rotate: 0, rotationY: 0, scale: 1, autoAlpha: 1 })
+    gsap.set(chosen, { x: 0, y: 0, rotate: 0, rotationY: 0, autoAlpha: 1 })
     return Promise.resolve()
   }
 
@@ -144,8 +173,6 @@ export const revealChosenCard = (
           x: 0,
           y: 0,
           rotate: 0,
-          yPercent: 0,
-          scale: 1,
           zIndex: 50,
           duration: DURATION.base,
           ease: EASE.glide,
