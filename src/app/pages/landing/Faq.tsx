@@ -17,6 +17,11 @@ import { Sticker } from '@ui/atoms'
  *   `drawn` a `draft`.
  * - Tamaño del grupo: `Group.MIN_MEMBERS_TO_DRAW` (3) y `Group.MAX_MEMBERS`
  *   (60).
+ * - Lista de deseos: tope de `WishlistItem.MAX_ITEMS` (20). La política RLS
+ *   `wishlist_select_group` (`0003_rls_policies.sql`) deja leerla a todo el
+ *   grupo, así que no se promete que sea privada: la interfaz solo la
+ *   destaca a quien regala (`SupabaseAssignmentRepository.findMine`), pero
+ *   la base de datos no se la oculta al resto.
  */
 const FAQ_ITEMS = [
   {
@@ -47,6 +52,11 @@ const FAQ_ITEMS = [
     question: '¿Qué pasa con mi promesa si cierro la página y vuelvo?',
     answer:
       'Se queda guardada tal cual. La misma carta te espera cada vez que entres a ese grupo, no se vuelve a sortear.',
+  },
+  {
+    question: '¿Cómo sabe mi amigo secreto qué regalarme?',
+    answer:
+      'Escribes tu lista de deseos dentro del grupo, con hasta 20 ideas, cada una con enlace y notas si quieres. Todo el grupo puede verla, y cuando se hace el sorteo se la mostramos destacada a la persona que te va a regalar.',
   },
 ] as const
 

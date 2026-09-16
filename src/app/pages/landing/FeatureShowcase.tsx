@@ -1,4 +1,5 @@
-import { BookOpenText, CalendarClock, Hand, Lock } from 'lucide-react'
+import type { ComponentType } from 'react'
+import { BookOpenText, Hand, ListChecks, Lock, type LucideIcon } from 'lucide-react'
 import { useScrollReveal } from '@animations'
 import { Sticker } from '@ui/atoms'
 import { Isotipo } from '@ui/brand'
@@ -8,31 +9,12 @@ import { Isotipo } from '@ui/brand'
  *
  * Cada mockup de abajo es maquetación fija, con texto ficticio a propósito
  * (igual que `HeroCollage`): la landing no puede importar el módulo de
- * promesas ni el de grupos (ver el comentario en `src/app/App.tsx`), así que
- * ninguno de estos paneles es el componente real ni usa datos reales.
+ * promesas, grupos ni deseos (ver el comentario en `src/app/App.tsx`), así
+ * que ninguno de estos paneles es el componente real ni usa datos reales.
+ * Por eso el envoltorio del mockup lleva `aria-hidden`: un lector de
+ * pantalla no debe anunciar "Audífonos inalámbricos" como si fuera un dato
+ * real de la cuenta de quien visita la página.
  */
-const FEATURES = [
-  {
-    icon: Lock,
-    title: 'Un sorteo de verdad secreto.',
-    body: 'Nadie se saca a sí mismo. El sorteo ocurre en el servidor, y ni siquiera quien organiza el grupo puede consultar quién le tocó a quién.',
-  },
-  {
-    icon: Hand,
-    title: 'Raspa para descubrir.',
-    body: 'Descubres a tu amigo secreto raspando la tarjeta con el dedo, como una lotería de verdad. Si prefieres, también puedes revelarlo con un toque.',
-  },
-  {
-    icon: BookOpenText,
-    title: 'Una promesa que se queda.',
-    body: 'Eliges una carta de un mazo con más de 60 versículos de la Reina-Valera 1960, en 12 estilos ilustrados distintos. Tu carta queda guardada para siempre.',
-  },
-  {
-    icon: CalendarClock,
-    title: 'Fecha, presupuesto y cuenta regresiva.',
-    body: 'Define cuándo es el intercambio y hasta cuánto gastar. El grupo entero ve cuántos días faltan, sin tener que preguntar.',
-  },
-] as const
 
 /** Mockup de la revelación por raspado. Estático, no es `ScratchReveal`. */
 const ScratchMockup = () => (
@@ -101,21 +83,61 @@ const SecretDrawMockup = () => (
   </div>
 )
 
-/** Mockup de fecha, presupuesto y cuenta regresiva ficticios. */
-const CountdownMockup = () => (
-  <div className="mx-auto flex aspect-[4/3] w-full max-w-[14rem] flex-col items-center justify-center gap-3">
-    <Sticker tone="apricot" className="px-6 py-3 text-center">
-      <p className="eyebrow">Faltan</p>
-      <p className="font-display text-h2 leading-none">12</p>
-      <p className="text-xs font-bold">días</p>
-    </Sticker>
-    <span className="inline-flex items-center gap-1.5 rounded-pill border-2 border-ink bg-paper px-3 py-1 text-xs font-bold">
-      Hasta $50.000
-    </span>
+/**
+ * Mockup de una lista de deseos. Título y notas inventados a mano — no viene
+ * de `WishlistItem` ni de ningún caso de uso real (esos viven en
+ * `@modules/wishlist`, fuera de los límites de esta landing).
+ */
+const WishlistMockup = () => (
+  <div className="mx-auto flex aspect-[4/3] w-full max-w-[14rem] flex-col justify-center gap-2 rounded-tile border-2 border-ink bg-paper p-4">
+    <p className="eyebrow">Mi lista de deseos</p>
+    <ul className="flex flex-col gap-1.5 text-left">
+      {['Audífonos inalámbricos', 'Un libro de poesía', 'Medias con estampado feo'].map((idea) => (
+        <li key={idea} className="flex items-center gap-2 text-sm font-bold text-ink">
+          <ListChecks className="size-3.5 shrink-0" />
+          {idea}
+        </li>
+      ))}
+    </ul>
   </div>
 )
 
-const MOCKUPS = [SecretDrawMockup, ScratchMockup, PromiseMockup, CountdownMockup] as const
+interface Feature {
+  readonly icon: LucideIcon
+  readonly title: string
+  readonly body: string
+  readonly Mockup: ComponentType
+}
+
+// Un solo arreglo, no dos paralelos: antes `FEATURES` y `MOCKUPS` se
+// emparejaban solo por índice, y era fácil desalinearlos al tocar uno sin
+// el otro. Así, mover o quitar una tarjeta mueve su mockup con ella.
+const FEATURES: readonly Feature[] = [
+  {
+    icon: Lock,
+    title: 'Un sorteo de verdad secreto.',
+    body: 'Nadie se saca a sí mismo. El sorteo ocurre en el servidor, y ni siquiera quien organiza el grupo puede consultar quién le tocó a quién.',
+    Mockup: SecretDrawMockup,
+  },
+  {
+    icon: Hand,
+    title: 'Raspa para descubrir.',
+    body: 'Descubres a tu amigo secreto raspando la tarjeta con el dedo, como una lotería de verdad. Si prefieres, también puedes revelarlo con un toque.',
+    Mockup: ScratchMockup,
+  },
+  {
+    icon: BookOpenText,
+    title: 'Una promesa que se queda.',
+    body: 'Eliges una carta de un mazo con más de 60 versículos de la Reina-Valera 1960, en 12 estilos ilustrados distintos. Tu carta queda guardada para siempre.',
+    Mockup: PromiseMockup,
+  },
+  {
+    icon: ListChecks,
+    title: 'Deja pistas para tu regalo.',
+    body: 'Escribe hasta 20 ideas de regalo, con enlace y notas si quieres. Cuando se hace el sorteo, quien te va a regalar la encuentra junto a tu nombre.',
+    Mockup: WishlistMockup,
+  },
+] as const
 
 export const FeatureShowcase = () => {
   const sectionRef = useScrollReveal<HTMLElement>()
@@ -130,33 +152,34 @@ export const FeatureShowcase = () => {
       </div>
 
       <ul data-reveal-group className="grid gap-6 sm:grid-cols-2">
-        {FEATURES.map((feature, index) => {
-          const Mockup = MOCKUPS[index]
-          return (
-            <Sticker
-              key={feature.title}
-              as="li"
-              className="flex list-none flex-col gap-4 p-6"
-              data-reveal
-            >
-              {/* Escenario de alto fijo: cada mockup mide distinto (la carta
-                  de promesa es 3/4, los demás 4/3), y sin esto el ícono y el
-                  título de cada tarjeta arrancan a una altura diferente. */}
-              <div className="grid h-60 place-items-center">{Mockup && <Mockup />}</div>
+        {FEATURES.map((feature) => (
+          <Sticker
+            key={feature.title}
+            as="li"
+            className="flex list-none flex-col gap-4 p-6"
+            data-reveal
+          >
+            {/* Escenario de alto fijo: cada mockup mide distinto (la carta
+                de promesa es 3/4, los demás 4/3), y sin esto el ícono y el
+                título de cada tarjeta arrancan a una altura diferente.
+                `aria-hidden`: todo el contenido de abajo es ficticio, ver el
+                comentario de arriba. */}
+            <div className="grid h-60 place-items-center" aria-hidden="true">
+              <feature.Mockup />
+            </div>
 
-              <div>
-                <span
-                  aria-hidden="true"
-                  className="mb-3 grid size-10 place-items-center rounded-full border-2 border-ink bg-paper"
-                >
-                  <feature.icon className="size-4" />
-                </span>
-                <h3 className="text-h3">{feature.title}</h3>
-                <p className="mt-1.5 text-base leading-relaxed text-ink-soft">{feature.body}</p>
-              </div>
-            </Sticker>
-          )
-        })}
+            <div>
+              <span
+                aria-hidden="true"
+                className="mb-3 grid size-10 place-items-center rounded-full border-2 border-ink bg-paper"
+              >
+                <feature.icon className="size-4" />
+              </span>
+              <h3 className="text-h3">{feature.title}</h3>
+              <p className="mt-1.5 text-base leading-relaxed text-ink-soft">{feature.body}</p>
+            </div>
+          </Sticker>
+        ))}
       </ul>
     </section>
   )
