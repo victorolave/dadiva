@@ -1,6 +1,7 @@
 import { getSupabaseClient, type DadivaClient } from '@core/infrastructure/supabase/client'
 
 import { SupabaseAuthRepository } from '@modules/auth/infrastructure/SupabaseAuthRepository'
+import { SignInWithGoogle } from '@modules/auth/application/use-cases/SignInWithGoogle'
 import { RequestMagicLink } from '@modules/auth/application/use-cases/RequestMagicLink'
 import { CompleteProfile } from '@modules/auth/application/use-cases/CompleteProfile'
 import { SignOut } from '@modules/auth/application/use-cases/SignOut'
@@ -36,6 +37,7 @@ import type { PromiseRepository } from '@modules/promises/domain/repositories/Pr
 export interface Container {
   readonly auth: {
     readonly repository: AuthRepository
+    readonly signInWithGoogle: SignInWithGoogle
     readonly requestMagicLink: RequestMagicLink
     readonly completeProfile: CompleteProfile
     readonly signOut: SignOut
@@ -82,6 +84,7 @@ export const createContainer = (overrides: ContainerOverrides = {}): Container =
   return {
     auth: {
       repository: authRepository,
+      signInWithGoogle: new SignInWithGoogle(authRepository),
       requestMagicLink: new RequestMagicLink(authRepository),
       completeProfile: new CompleteProfile(authRepository),
       signOut: new SignOut(authRepository),

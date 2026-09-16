@@ -8,6 +8,7 @@ export type AuthStatus = 'loading' | 'authenticated' | 'anonymous'
 export interface AuthContextValue {
   readonly status: AuthStatus
   readonly user: AuthenticatedUser | null
+  readonly signInWithGoogle: () => Promise<DomainError | null>
   readonly requestMagicLink: (email: string) => Promise<{ sentTo: string } | DomainError>
   readonly completeProfile: (input: {
     displayName: string
@@ -52,6 +53,15 @@ export const AuthProvider = ({ children }: { readonly children: ReactNode }) => 
     }
   }, [auth.repository])
 
+  const signInWithGoogle = useCallback(async () => {
+    const result = await auth.signInWithGoogle.execute({
+      redirectTo: `${window.location.origin}/entrar/confirmar`,
+    })
+    // Devolvemos el error o null: si todo va bien el navegador ya se fue a
+    // Google y nadie llega a leer esta respuesta.
+    return result.match<DomainError | null>({ ok: () => null, err: (error) => error })
+  }, [auth.signInWithGoogle])
+
   const requestMagicLink = useCallback(
     async (email: string) => {
       const result = await auth.requestMagicLink.execute({
@@ -87,8 +97,8 @@ export const AuthProvider = ({ children }: { readonly children: ReactNode }) => 
   }, [auth.signOut])
 
   const value = useMemo<AuthContextValue>(
-    () => ({ status, user, requestMagicLink, completeProfile, signOut }),
-    [status, user, requestMagicLink, completeProfile, signOut],
+    () => ({ status, user, signInWithGoogle, requestMagicLink, completeProfile, signOut }),
+    [status, user, signInWithGoogle, requestMagicLink, completeProfile, signOut],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

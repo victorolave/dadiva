@@ -33,8 +33,14 @@ La promesa se saca **una sola vez** y queda guardada: vuelves semanas después y
 | Build | Vite 8 |
 | Tests | Vitest + Testing Library |
 
-Autenticación por **magic link**: sin contraseñas, y el reingreso funciona desde
-cualquier dispositivo.
+Autenticación con **Google OAuth**: un toque, sin contraseñas y sin depender de que
+un correo se entregue. Todo el intercambio ocurre por redirección dentro del mismo
+navegador, así que no hay cuotas de envío, ni dominio que verificar, ni carpeta de spam.
+
+El acceso por enlace mágico sigue implementado y probado en `modules/auth`, pero **no se
+expone en la interfaz**: sin un dominio verificado el proveedor de correo solo entrega a
+la dirección dueña de la cuenta, y un formulario que no entrega nada es peor que ningún
+formulario. Se reactiva en cuanto haya dominio.
 
 ---
 
@@ -157,6 +163,19 @@ pnpm install
 cp .env.example .env     # completa con tus datos de Supabase
 pnpm dev
 ```
+
+### Google OAuth
+
+1. **Google Cloud Console** → *APIs & Services* → *Credentials* → crea un
+   **OAuth 2.0 Client ID** de tipo *Web application*.
+2. En **Authorized redirect URIs** pega la URL de callback de tu proyecto. Cópiala tal
+   cual desde Supabase → *Authentication* → *Providers* → *Google*; no la escribas a
+   mano. En local es `http://127.0.0.1:54321/auth/v1/callback`.
+3. Vuelve a esa misma página de Supabase, activa el proveedor y pega el **Client ID** y
+   el **Client Secret**.
+4. En **Authentication** → *URL Configuration*, asegúrate de que tu origen esté en
+   *Redirect URLs* (ej. `http://localhost:5173/**`). Si no está, Supabase ignora el
+   `redirectTo` **en silencio** y te manda al Site URL.
 
 ### Supabase
 

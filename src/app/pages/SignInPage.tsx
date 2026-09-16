@@ -1,59 +1,38 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { MailCheck } from 'lucide-react'
 import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import { useEntranceAnimation } from '@animations'
-import { Alert, Button, Sticker, TextField } from '@ui/atoms'
+import { Alert, Button, GoogleMark, Sticker } from '@ui/atoms'
 
+/**
+ * Puerta de entrada.
+ *
+ * Solo ofrecemos Google. El enlace por correo sigue implementado y probado en
+ * el módulo de auth, pero NO se expone: sin un dominio verificado el proveedor
+ * de correo solo entrega a la dirección dueña de la cuenta, así que para
+ * cualquier invitado el enlace no llegaría jamás. Un formulario que traga la
+ * petición y no entrega nada es exactamente el fallo silencioso que ya nos
+ * costó una tarde de depuración. Se reactiva el día que haya dominio.
+ */
 export const SignInPage = () => {
-  const { user, status, requestMagicLink } = useAuth()
-  const [email, setEmail] = useState('')
-  const [sentTo, setSentTo] = useState<string | null>(null)
+  const { user, status, signInWithGoogle } = useAuth()
   const [error, setError] = useState<string | null>(null)
-  const [isSending, setIsSending] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
   const containerRef = useEntranceAnimation<HTMLDivElement>()
 
   if (status === 'authenticated' && user) return <Navigate to="/grupos" replace />
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
+  const handleGoogle = async () => {
     setError(null)
-    setIsSending(true)
+    setIsRedirecting(true)
 
-    const result = await requestMagicLink(email)
-    setIsSending(false)
+    const failure = await signInWithGoogle()
 
-    if ('sentTo' in result) {
-      setSentTo(result.sentTo)
-      return
+    // Si todo salió bien el navegador ya va camino a Google y esto no corre.
+    if (failure) {
+      setError(failure.message)
+      setIsRedirecting(false)
     }
-
-    setError(result.message)
-  }
-
-  if (sentTo) {
-    return (
-      <div className="mx-auto flex max-w-md flex-col items-center gap-5 text-center">
-        <Sticker tone="sage" className="flex flex-col items-center gap-4 p-8">
-          <MailCheck className="size-10" aria-hidden="true" />
-          <h1 className="text-display-sm">Revisa tu correo</h1>
-          <p className="text-ink-soft">
-            Enviamos un enlace de acceso a <strong className="font-semibold">{sentTo}</strong>.
-            Ábrelo desde este mismo dispositivo y entras directo.
-          </p>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setSentTo(null)
-              setError(null)
-            }}
-          >
-            Usar otro correo
-          </Button>
-        </Sticker>
-      </div>
-    )
   }
 
   return (
@@ -61,32 +40,33 @@ export const SignInPage = () => {
       <div data-animate className="text-center">
         <h1 className="text-display-lg">Entra a Dádiva</h1>
         <p className="mt-2 text-ink-soft">
-          Sin contraseñas. Te mandamos un enlace y listo.
+          Un toque y listo. No necesitas crear ninguna contraseña.
         </p>
       </div>
 
-      <Sticker data-animate className="p-6">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
-          <TextField
-            label="Tu correo"
-            type="email"
-            name="email"
-            autoComplete="email"
-            inputMode="email"
-            placeholder="maria@correo.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            hint="Te llegará un enlace de un solo uso."
-            required
-          />
+      <Sticker data-animate className="flex flex-col gap-5 p-6">
+        <Button
+          variant="secondary"
+          size="lg"
+          fullWidth
+          onClick={() => void handleGoogle()}
+          isLoading={isRedirecting}
+          iconStart={<GoogleMark className="size-5" />}
+        >
+          Continuar con Google
+        </Button>
 
-          {error && <Alert tone="error">{error}</Alert>}
+        {error && <Alert tone="error">{error}</Alert>}
 
-          <Button type="submit" size="lg" fullWidth isLoading={isSending}>
-            Enviarme el enlace
-          </Button>
-        </form>
+        <p className="text-center text-xs leading-relaxed text-ink-faint">
+          Usamos tu cuenta solo para saber quién eres dentro de tus grupos.
+          No publicamos nada ni leemos tu correo.
+        </p>
       </Sticker>
+
+      <p data-animate className="text-center text-sm text-ink-soft">
+        ¿Te invitaron a un grupo? Entra primero y luego usa el código que te compartieron.
+      </p>
     </div>
   )
 }

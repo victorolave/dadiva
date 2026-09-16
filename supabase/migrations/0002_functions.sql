@@ -38,7 +38,7 @@ end;
 $$;
 
 comment on function public.handle_new_user() is
-  'Crea el profile al registrarse un usuario. Con magic link el display_name inicial sale del email.';
+  'Crea el profile al registrarse un usuario. Con Google el display_name sale de full_name, así nadie pasa por onboarding; con magic link cae al usuario del email.';
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
