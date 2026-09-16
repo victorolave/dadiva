@@ -82,10 +82,25 @@ export class SupabaseAuthRepository implements AuthRepository {
         )
       }
 
+      // Upsert y no update: si la fila de `profiles` no existe, un UPDATE no
+      // afecta ninguna fila y falla al pedir `.single()`. Eso pasa de verdad —
+      // le ocurrió al primer usuario de producción, creado antes de que el
+      // trigger `handle_new_user` existiera — y también puede pasar por una
+      // carrera entre el alta en auth.users y el disparo del trigger.
+      //
+      // Es seguro: las políticas de INSERT y UPDATE sobre `profiles` exigen
+      // ambas `id = auth.uid()`, así que nadie puede crear ni pisar un perfil
+      // ajeno por esta vía.
       const { data, error } = await this.client
         .from('profiles')
-        .update({ display_name: input.displayName, avatar_emoji: input.avatarEmoji })
-        .eq('id', userData.user.id)
+        .upsert(
+          {
+            id: userData.user.id,
+            display_name: input.displayName,
+            avatar_emoji: input.avatarEmoji,
+          },
+          { onConflict: 'id' },
+        )
         .select('id, display_name, avatar_emoji')
         .single()
 
