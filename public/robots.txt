@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# A propósito NO hay Disallow para las rutas privadas (/grupos, /perfil,
+# /unirse, /entrar/confirmar): una URL bloqueada aquí nunca se rastrea, así
+# que Google jamás llegaría a ver la cabecera `X-Robots-Tag: noindex` que
+# esas rutas devuelven (ver vercel.json) -esa cabecera es la que de verdad
+# evita que queden indexadas. Bloquear el rastreo en cambio solo lograría
+# que la URL desnuda, sin título ni descripción, apareciera igual en los
+# resultados por los enlaces que apuntan a ella desde el resto del sitio.
+
+Sitemap: https://dadiva-gray.vercel.app/sitemap.xml

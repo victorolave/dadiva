@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Solo páginas públicas e indexables: la portada, las dos páginas legales y
+  la entrada. /entrar se incluye porque es pública, no expone nada de nadie
+  y es una puerta de marca legítima para quien busca "Dádiva" o "amigo
+  secreto Dádiva" directamente; todo lo que cuelga de /grupos, /perfil y
+  /unirse es privado y va con `X-Robots-Tag: noindex` (ver vercel.json), así
+  que no pertenece aquí.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://dadiva-gray.vercel.app/</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+  <url>
+    <loc>https://dadiva-gray.vercel.app/entrar</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+  <url>
+    <loc>https://dadiva-gray.vercel.app/privacidad</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+  <url>
+    <loc>https://dadiva-gray.vercel.app/terminos</loc>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+</urlset>
