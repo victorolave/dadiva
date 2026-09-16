@@ -23,6 +23,13 @@ import { DrawMyPromise } from '@modules/promises/application/use-cases/DrawMyPro
 import { GetMyPromise } from '@modules/promises/application/use-cases/GetMyPromise'
 import type { PromiseRepository } from '@modules/promises/domain/repositories/PromiseRepository'
 
+import { SupabaseWishlistRepository } from '@modules/wishlist/infrastructure/SupabaseWishlistRepository'
+import { ListMyWishlist } from '@modules/wishlist/application/use-cases/ListMyWishlist'
+import { AddWishlistItem } from '@modules/wishlist/application/use-cases/AddWishlistItem'
+import { UpdateWishlistItem } from '@modules/wishlist/application/use-cases/UpdateWishlistItem'
+import { DeleteWishlistItem } from '@modules/wishlist/application/use-cases/DeleteWishlistItem'
+import type { WishlistRepository } from '@modules/wishlist/domain/repositories/WishlistRepository'
+
 /**
  * Composition Root.
  *
@@ -56,6 +63,13 @@ export interface Container {
     readonly draw: DrawMyPromise
     readonly getMine: GetMyPromise
   }
+  readonly wishlist: {
+    readonly repository: WishlistRepository
+    readonly list: ListMyWishlist
+    readonly add: AddWishlistItem
+    readonly update: UpdateWishlistItem
+    readonly remove: DeleteWishlistItem
+  }
 }
 
 export interface ContainerOverrides {
@@ -63,6 +77,7 @@ export interface ContainerOverrides {
   readonly groupRepository?: GroupRepository
   readonly assignmentRepository?: AssignmentRepository
   readonly promiseRepository?: PromiseRepository
+  readonly wishlistRepository?: WishlistRepository
 }
 
 export const createContainer = (overrides: ContainerOverrides = {}): Container => {
@@ -80,6 +95,8 @@ export const createContainer = (overrides: ContainerOverrides = {}): Container =
     overrides.assignmentRepository ?? new SupabaseAssignmentRepository(resolveClient())
   const promiseRepository =
     overrides.promiseRepository ?? new SupabasePromiseRepository(resolveClient())
+  const wishlistRepository =
+    overrides.wishlistRepository ?? new SupabaseWishlistRepository(resolveClient())
 
   return {
     auth: {
@@ -102,6 +119,13 @@ export const createContainer = (overrides: ContainerOverrides = {}): Container =
       repository: promiseRepository,
       draw: new DrawMyPromise(promiseRepository),
       getMine: new GetMyPromise(promiseRepository),
+    },
+    wishlist: {
+      repository: wishlistRepository,
+      list: new ListMyWishlist(wishlistRepository),
+      add: new AddWishlistItem(wishlistRepository),
+      update: new UpdateWishlistItem(wishlistRepository),
+      remove: new DeleteWishlistItem(wishlistRepository),
     },
   }
 }

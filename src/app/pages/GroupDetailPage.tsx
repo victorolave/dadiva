@@ -18,6 +18,7 @@ import {
 import { PromiseDeck } from '@modules/promises/presentation/components/PromiseDeck'
 import { PROMISE_CATALOG } from '@modules/promises/infrastructure/data/promiseCatalog'
 import type { PromiseCard } from '@modules/promises/domain/entities/PromiseCard'
+import { WishlistSection } from '@modules/wishlist/presentation/components/WishlistSection'
 import { Alert, Badge, Button, Skeleton, Sticker, VisibilityNote } from '@ui/atoms'
 
 const formatDate = (date: Date): string =>
@@ -36,7 +37,7 @@ export const GroupDetailPage = () => {
   const { groups, promises } = useContainer()
 
   const groupId = id ? asGroupId(id) : null
-  const { group, error, isLoading, reload } = useGroupDetail(groupId)
+  const { group, error, isLoading, reload, refresh } = useGroupDetail(groupId)
 
   const [assignment, setAssignment] = useState<MyAssignment | null>(null)
   const [promise, setPromise] = useState<PromiseCard | null>(null)
@@ -110,6 +111,7 @@ export const GroupDetailPage = () => {
   const drawGuard = group.canDraw(user.id)
   const daysLeft = group.daysUntilExchange()
   const showCountdown = daysLeft !== null && daysLeft >= 0
+  const myMember = group.memberForUser(user.id)
 
   // El nombre de quien organiza es público para el grupo (group_members lo
   // expone a todo miembro, ver supabase/migrations/0003_rls_policies.sql),
@@ -267,6 +269,12 @@ export const GroupDetailPage = () => {
           <PromiseDeck savedCard={promise} highlight={highlight} onDraw={handleDrawPromise} />
         </section>
       )}
+
+      <WishlistSection
+        memberId={myMember?.id ?? null}
+        canEdit={group.status !== 'closed'}
+        onItemsChanged={refresh}
+      />
 
       <MemberList members={group.members} currentUserId={user.id} />
     </div>

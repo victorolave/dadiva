@@ -10,13 +10,10 @@ export const useGroupDetail = (groupId: GroupId | null) => {
   const [error, setError] = useState<DomainError | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  const reload = useCallback(async () => {
+  const fetchGroup = useCallback(async () => {
     if (!groupId) return
 
-    setIsLoading(true)
     const result = await groups.detail.execute(groupId)
-    setIsLoading(false)
-
     result.match({
       ok: (loaded) => {
         setGroup(loaded)
@@ -26,9 +23,20 @@ export const useGroupDetail = (groupId: GroupId | null) => {
     })
   }, [groups.detail, groupId])
 
+  const reload = useCallback(async () => {
+    setIsLoading(true)
+    await fetchGroup()
+    setIsLoading(false)
+  }, [fetchGroup])
+
+  // Refresca sin pasar por `isLoading`: la página no vuelve al skeleton, así
+  // que no se desmonta nada. Si se desmontara, `AssignmentReveal` perdería el
+  // estado de la carta ya raspada y la volvería a cubrir.
+  const refresh = useCallback(() => fetchGroup(), [fetchGroup])
+
   useEffect(() => {
     void reload()
   }, [reload])
 
-  return { group, error, isLoading, reload }
+  return { group, error, isLoading, reload, refresh }
 }
