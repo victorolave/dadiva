@@ -18,6 +18,31 @@ import type { AuthRepository } from '../domain/repositories/AuthRepository'
 export class SupabaseAuthRepository implements AuthRepository {
   constructor(private readonly client: DadivaClient) {}
 
+  async signInWithGoogle(redirectTo: string): Promise<Result<void, DomainError>> {
+    try {
+      const { error } = await this.client.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo,
+          queryParams: {
+            // `select_account` obliga a Google a mostrar el selector de cuenta.
+            // Sin esto, quien tiene varias cuentas entra siempre con la última
+            // y no hay forma visible de cambiarla: un clásico de soporte.
+            prompt: 'select_account',
+          },
+        },
+      })
+
+      if (error) return err(this.mapAuthError(error))
+
+      // Si no hubo error, el navegador ya está saliendo hacia Google. El código
+      // posterior a esta línea normalmente no llega a ejecutarse.
+      return ok(undefined)
+    } catch (cause) {
+      return err(unexpectedError(cause))
+    }
+  }
+
   async sendMagicLink(email: Email, redirectTo: string): Promise<Result<void, DomainError>> {
     try {
       const { error } = await this.client.auth.signInWithOtp({
@@ -144,10 +169,18 @@ export class SupabaseAuthRepository implements AuthRepository {
   private mapAuthError(error: AuthError): DomainError {
     // Supabase limita la frecuencia de envío de magic links. Es el error más
     // común que verá una persona real, así que merece su propio mensaje.
+    //
+    // NO prometemos una duración concreta. Conviven dos límites distintos y
+    // desde aquí no sabemos cuál se disparó: el intervalo mínimo entre correos
+    // al mismo destinatario (60s por defecto) y el tope del servicio de correo
+    // (2 por hora en el integrado de Supabase, 30 por hora con SMTP propio).
+    // Decir "espera un minuto" cuando en realidad falta una hora es peor que
+    // no decir nada: la persona reintenta, falla, y pierde la confianza.
     if (error.status === 429) {
       return DomainErrors.conflict(
         'auth.rate_limited',
-        'Acabamos de enviarte un enlace. Espera un minuto antes de pedir otro.',
+        'Ya te enviamos un enlace hace poco. Revísalo en tu correo, incluida la ' +
+          'carpeta de spam. Si necesitas otro, tendrás que esperar un rato.',
       )
     }
 
