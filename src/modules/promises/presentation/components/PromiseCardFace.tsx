@@ -61,7 +61,12 @@ export const PromiseCardFace = forwardRef<HTMLDivElement, PromiseCardFaceProps>(
               segment.emphasized ? (
                 <mark
                   key={index}
-                  className="rounded-[0.35em] bg-transparent px-[0.22em] py-[0.05em]"
+                  // Padding horizontal mínimo: con 0.22em el resaltado empujaba
+                  // la puntuación siguiente y el texto se leía «temen .», como
+                  // un error de tipeo. `box-decoration-break: clone` hace que
+                  // un resaltado partido en dos líneas conserve sus esquinas
+                  // redondeadas en ambas.
+                  className="rounded-[0.3em] bg-transparent px-[0.06em] py-[0.08em] [box-decoration-break:clone] [-webkit-box-decoration-break:clone]"
                   style={{
                     // El acento va detrás del texto con baja opacidad para no
                     // comprometer el contraste AA que ya garantiza ink/background.
