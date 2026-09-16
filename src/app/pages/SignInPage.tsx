@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@modules/auth/presentation/AuthProvider'
+import { isSafeReturnPath, rememberReturnTo } from '../routes/returnTo'
 import { useEntranceAnimation } from '@animations'
 import { Alert, Button, GoogleMark, Sticker } from '@ui/atoms'
 
@@ -19,12 +20,19 @@ export const SignInPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [isRedirecting, setIsRedirecting] = useState(false)
   const containerRef = useEntranceAnimation<HTMLDivElement>()
+  const location = useLocation()
 
-  if (status === 'authenticated' && user) return <Navigate to="/grupos" replace />
+  // A dónde iba antes de que ProtectedRoute lo mandara aquí (p. ej. /unirse/CODIGO).
+  const from = (location.state as { from?: unknown } | null)?.from
+
+  if (status === 'authenticated' && user) {
+    return <Navigate to={isSafeReturnPath(from) ? from : '/grupos'} replace />
+  }
 
   const handleGoogle = async () => {
     setError(null)
     setIsRedirecting(true)
+    rememberReturnTo(from)
 
     const failure = await signInWithGoogle()
 

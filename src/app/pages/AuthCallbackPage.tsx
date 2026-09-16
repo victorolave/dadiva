@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import { Alert, LinkButton, Skeleton, Sticker } from '@ui/atoms'
+import { clearReturnTo, readReturnTo } from '../routes/returnTo'
 
 /** Traduce los códigos de error que Supabase devuelve en la URL. */
 const ERROR_MESSAGES: Record<string, string> = {
@@ -51,6 +52,9 @@ export const AuthCallbackPage = () => {
 
   // Se lee una sola vez: Supabase limpia la URL después de procesarla.
   const urlError = useMemo(readErrorFromUrl, [])
+  // useState y no useMemo: React no garantiza conservar un memo, y este valor
+  // tiene que ser el mismo en ambas pasadas de StrictMode.
+  const [returnTo] = useState(readReturnTo)
 
   useEffect(() => {
     if (status !== 'loading') return
@@ -60,10 +64,19 @@ export const AuthCallbackPage = () => {
   }, [status])
 
   useEffect(() => {
-    if (status === 'authenticated' && user) {
-      navigate(user.needsOnboarding ? '/perfil' : '/grupos', { replace: true })
+    if (status !== 'authenticated' || !user) return
+
+    // Si venía de un enlace de invitación, ese es su destino. Quien entra por
+    // primera vez pasa antes por /perfil, que lo reenvía ahí al guardar.
+    const destination = returnTo ?? '/grupos'
+    clearReturnTo()
+
+    if (user.needsOnboarding) {
+      navigate('/perfil', { replace: true, state: { from: destination } })
+    } else {
+      navigate(destination, { replace: true })
     }
-  }, [status, user, navigate])
+  }, [status, user, navigate, returnTo])
 
   const failed = urlError !== null || status === 'anonymous' || timedOut
 

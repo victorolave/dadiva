@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import { Alert, Button, Sticker, TextField } from '@ui/atoms'
 import { cn } from '@ui/utils/cn'
+import { isSafeReturnPath } from '../routes/returnTo'
 
 const EMOJI_OPTIONS = ['🎁', '🌷', '✨', '🕊️', '🌻', '💛', '🍀', '🌈', '☕', '📖', '🧁', '🫶'] as const
 
@@ -16,7 +17,8 @@ export const ProfilePage = () => {
   const [error, setError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
 
-  const returnTo = (location.state as { from?: string } | null)?.from ?? '/grupos'
+  const from = (location.state as { from?: unknown } | null)?.from
+  const returnTo = isSafeReturnPath(from) ? from : '/grupos'
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
