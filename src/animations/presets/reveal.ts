@@ -30,10 +30,12 @@ export const revealAssignment = (
         transformOrigin: 'top center',
       })
       .to(flap, { autoAlpha: 0, duration: 0.2 }, '-=0.15')
+      // El recorrido va en porcentaje de la propia altura del papel: así el
+      // gesto se mantiene proporcionado aunque el nombre ocupe una o dos líneas.
       .fromTo(
         slip,
-        { yPercent: 18, autoAlpha: 0, scale: 0.94 },
-        { yPercent: -46, autoAlpha: 1, scale: 1, duration: DURATION.deliberate, ease: EASE.settle },
+        { yPercent: 8, autoAlpha: 0, scale: 0.94 },
+        { yPercent: -92, autoAlpha: 1, scale: 1, duration: DURATION.deliberate, ease: EASE.settle },
       )
       .fromTo(
         name,

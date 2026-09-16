@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import { ExternalLink, Gift } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import { revealAssignment, paperConfetti } from '@animations'
 import { Button, Sticker } from '@ui/atoms'
 import type { MyAssignment } from '../../domain/repositories/AssignmentRepository'
@@ -90,17 +90,44 @@ export const AssignmentReveal = ({ assignment, onReveal }: AssignmentRevealProps
 
   return (
     <div className="relative flex flex-col items-center gap-6 overflow-hidden py-4">
+      {/*
+        El sobre se dibuja en SVG y no con clip-path.
+        Un clip-path recorta el borde junto con el relleno: la solapa quedaba
+        como un triángulo de color sin contorno en sus diagonales, y el conjunto
+        no se leía como una figura cerrada. En SVG el trazo sigue el contorno
+        real de cada pieza, que es justo lo que pide la estética de tinta.
+
+        Cuatro capas, en este orden de profundidad:
+          1. cuerpo    — el sobre completo, al fondo
+          2. papel     — sale de adentro
+          3. bolsillo  — panel frontal; tapa la parte baja del papel
+          4. solapa    — gira hacia atrás al abrirse
+      */}
       <div
         ref={envelopeRef}
         className="relative aspect-[3/2] w-full max-w-xs"
         style={{ perspective: '900px' }}
       >
-        <div className="absolute inset-0 rounded-card border-2 border-ink bg-apricot-300 shadow-sticker-lg" />
+        {/* 1 · cuerpo */}
+        <svg viewBox="0 0 300 200" className="absolute inset-0 size-full" aria-hidden="true">
+          <rect
+            x="1.5"
+            y="1.5"
+            width="297"
+            height="197"
+            rx="12"
+            className="fill-apricot-300 stroke-ink"
+            strokeWidth="2.5"
+          />
+        </svg>
 
-        {/* El papel sale de adentro: va detrás de la solapa y delante del fondo. */}
+        {/* 2 · el papel con el nombre */}
         <div
           ref={slipRef}
-          className="absolute inset-x-6 top-4 z-10 rounded-sticker border-2 border-ink bg-paper px-4 py-3 text-center opacity-0"
+          // Arranca a media altura, escondido detrás del bolsillo, y sube sin
+          // llegar a despegarse: el pie queda tapado para que el papel parezca
+          // salir DE DENTRO del sobre y no flotar encima.
+          className="absolute inset-x-7 top-[52%] z-10 rounded-sticker border-2 border-ink bg-paper px-4 py-3 text-center opacity-0"
         >
           <p className="label-mono text-ink-faint">Te tocó</p>
           <p ref={nameRef} className="mt-1 font-display text-2xl leading-tight opacity-0">
@@ -108,21 +135,49 @@ export const AssignmentReveal = ({ assignment, onReveal }: AssignmentRevealProps
           </p>
         </div>
 
+        {/* 3 · bolsillo frontal: el papel parece salir de detrás de él */}
+        <svg
+          viewBox="0 0 300 200"
+          className="pointer-events-none absolute inset-0 z-20 size-full"
+          aria-hidden="true"
+        >
+          <path
+            d="M1.5 96 L150 170 L298.5 96 L298.5 186.5 Q298.5 198.5 286.5 198.5 L13.5 198.5 Q1.5 198.5 1.5 186.5 Z"
+            className="fill-apricot-500 stroke-ink"
+            strokeWidth="2.5"
+            strokeLinejoin="round"
+          />
+        </svg>
+
+        {/* 4 · solapa */}
         <div
           ref={flapRef}
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 z-20 h-1/2 origin-top"
+          className="absolute inset-x-0 top-0 z-30 h-[58%] origin-top"
           style={{ transformStyle: 'preserve-3d' }}
         >
-          <div
-            className="size-full border-2 border-ink bg-apricot-500"
-            style={{ clipPath: 'polygon(0 0, 100% 0, 50% 100%)' }}
-          />
+          <svg viewBox="0 0 300 116" className="size-full overflow-visible">
+            <path
+              d="M1.5 13.5 Q1.5 1.5 13.5 1.5 L286.5 1.5 Q298.5 1.5 298.5 13.5 L150 112 Z"
+              className="fill-apricot-500 stroke-ink"
+              strokeWidth="2.5"
+              strokeLinejoin="round"
+            />
+            {/* Sello sobre la punta de la solapa: refuerza la lectura de
+                «cerrado» y se levanta junto con ella al abrir. */}
+            <circle cx="150" cy="93" r="15" className="fill-blush-500 stroke-ink" strokeWidth="2.5" />
+            <text
+              x="150"
+              y="93"
+              textAnchor="middle"
+              dominantBaseline="central"
+              className="fill-ink font-display"
+              fontSize="16"
+            >
+              D
+            </text>
+          </svg>
         </div>
-
-        <span className="absolute bottom-3 left-1/2 z-30 -translate-x-1/2">
-          <Gift className="size-6" aria-hidden="true" />
-        </span>
       </div>
 
       <Button size="lg" onClick={() => void handleOpen()} isLoading={isAnimating}>
