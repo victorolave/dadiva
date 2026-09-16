@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@modules/auth/presentation/AuthProvider'
-import { Alert, Button, Sticker, TextField } from '@ui/atoms'
+import { Alert, Avatar, Button, Sticker, TextField } from '@ui/atoms'
 import { cn } from '@ui/utils/cn'
 import { isSafeReturnPath } from '../routes/returnTo'
 
@@ -37,11 +37,21 @@ export const ProfilePage = () => {
   }
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6">
+    <div className="mx-auto flex max-w-narrow flex-col gap-6">
       <div className="text-center">
-        <h1 className="text-display-lg">¿Cómo te llamamos?</h1>
-        <p className="mt-2 text-ink-soft">Este es el nombre que verán en tus grupos.</p>
+        <p className="eyebrow">Perfil</p>
+        <h1 className="mt-2 text-h1">¿Cómo te llamamos?</h1>
       </div>
+
+      {/* Vista previa en vivo: refleja nombre y emoji mientras se escriben,
+          igual que se verán en la lista de miembros de un grupo. */}
+      <Sticker tone="blush" className="flex items-center gap-4 p-4">
+        <Avatar emoji={avatarEmoji} size="xl" tint="paper" />
+        <div className="min-w-0">
+          <p className="truncate font-display text-h3">{displayName.trim() || 'Tu nombre'}</p>
+          <p className="text-sm text-ink-soft">Así te verán en tus grupos.</p>
+        </div>
+      </Sticker>
 
       <Sticker className="p-6">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
@@ -56,8 +66,8 @@ export const ProfilePage = () => {
           />
 
           <fieldset className="flex flex-col gap-2">
-            <legend className="label-mono text-ink-soft">Elige tu emoji</legend>
-            <div className="flex flex-wrap gap-2">
+            <legend className="text-sm font-bold">Elige tu emoji</legend>
+            <div className="grid grid-cols-6 gap-2">
               {EMOJI_OPTIONS.map((emoji) => {
                 const isSelected = emoji === avatarEmoji
                 return (
@@ -68,10 +78,9 @@ export const ProfilePage = () => {
                     aria-pressed={isSelected}
                     aria-label={`Emoji ${emoji}`}
                     className={cn(
-                      'grid size-11 place-items-center rounded-sticker border-2 text-xl transition-all',
-                      isSelected
-                        ? 'border-ink bg-blush-300 shadow-sticker'
-                        : 'border-ink/25 bg-paper hover:border-ink',
+                      'grid size-11 place-items-center rounded-control border-2 border-ink text-xl',
+                      'transition-[background-color,box-shadow] duration-120 ease-standard',
+                      isSelected ? 'bg-blush-300 shadow-sticker-sm' : 'bg-paper hover:bg-paper-deep',
                     )}
                   >
                     <span aria-hidden="true">{emoji}</span>

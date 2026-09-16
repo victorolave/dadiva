@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import { Alert, LinkButton, Skeleton, Sticker } from '@ui/atoms'
+import { Isotipo } from '@ui/brand'
 import { clearReturnTo, readReturnTo } from '../routes/returnTo'
 
 /** Traduce los códigos de error que Supabase devuelve en la URL. */
@@ -88,7 +89,7 @@ export const AuthCallbackPage = () => {
         : 'El enlace no creó una sesión válida.'
 
     return (
-      <div className="mx-auto flex max-w-md flex-col gap-4">
+      <div className="mx-auto flex max-w-narrow flex-col gap-4">
         <Alert tone="error" title="No pudimos validar el enlace">
           {message}
         </Alert>
@@ -117,11 +118,13 @@ export const AuthCallbackPage = () => {
           </Sticker>
         )}
 
+        {/* "Volver a entrar", no "Pedir un enlace nuevo": ya no hay enlace
+            por correo expuesto (ver comentario de SignInPage), solo Google. */}
         <div className="flex justify-center">
-          <LinkButton to="/entrar">Pedir un enlace nuevo</LinkButton>
+          <LinkButton to="/entrar">Volver a entrar</LinkButton>
         </div>
 
-        <p className="text-center text-sm text-ink-faint">
+        <p className="text-center text-sm text-ink-soft">
           Abre el enlace en el mismo navegador donde lo pediste. Si lo abres desde otra
           app, la sesión no puede completarse.
         </p>
@@ -130,9 +133,11 @@ export const AuthCallbackPage = () => {
   }
 
   return (
-    <div className="mx-auto max-w-md" aria-busy="true">
-      <Sticker className="flex flex-col gap-3 p-8">
-        <p className="label-mono text-ink-soft">Validando tu enlace…</p>
+    <div className="mx-auto max-w-narrow" aria-busy="true">
+      <Sticker className="flex flex-col items-center gap-3 p-8 text-center">
+        <Isotipo size={48} />
+        <p className="eyebrow">Entrada</p>
+        <p className="font-display text-h3">Validando tu entrada…</p>
         <Skeleton className="h-6 w-3/4" />
         <Skeleton className="h-6 w-1/2" />
       </Sticker>

@@ -11,17 +11,18 @@ export interface LegalLayoutProps {
  * Estructura compartida de las páginas legales.
  *
  * El texto legal se lee mal en columnas anchas, así que va a ancho de lectura
- * cómodo (~65 caracteres) y con jerarquía clara. Que sea obligatorio no es
- * excusa para que sea ilegible.
+ * cómodo (~65 caracteres) y con jerarquía clara. Sin blobs ni garabatos: son
+ * ornamento y aquí la prioridad es la lectura larga.
  */
 export const LegalLayout = ({ title, updatedAt, children }: LegalLayoutProps) => (
-  <article className="mx-auto flex max-w-2xl flex-col gap-6">
+  <article className="mx-auto flex max-w-reading flex-col gap-6">
     <header>
-      <h1 className="text-display-lg">{title}</h1>
-      <p className="label-mono mt-2 text-ink-faint">Última actualización · {updatedAt}</p>
+      <p className="eyebrow">Legal</p>
+      <h1 className="mt-2 text-h1">{title}</h1>
+      <p className="mt-2 text-sm text-ink-soft">Última actualización · {updatedAt}</p>
     </header>
 
-    <Sticker className="flex flex-col gap-6 p-6 sm:p-8 [&_h2]:text-display-sm [&_li]:leading-relaxed [&_p]:leading-relaxed [&_p]:text-ink-soft [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:text-ink-soft">
+    <Sticker className="flex flex-col gap-6 p-6 sm:p-8 [&_h2]:text-h3 [&_li]:leading-relaxed [&_p]:leading-relaxed [&_p]:text-ink-soft [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:text-ink-soft">
       {children}
     </Sticker>
   </article>

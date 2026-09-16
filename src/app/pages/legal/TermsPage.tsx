@@ -66,7 +66,7 @@ export const TermsPage = () => (
       </p>
       <p>
         Puedes dejar de usarla cuando quieras y pedir que borremos tu cuenta escribiendo a{' '}
-        <a href={`mailto:${CONTACT}`} className="text-lilac-900 underline">
+        <a href={`mailto:${CONTACT}`} className="link">
           {CONTACT}
         </a>
         .

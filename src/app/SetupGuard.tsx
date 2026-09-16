@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { getEnv } from '@core/infrastructure/env'
+import { BrandLogo } from '@ui/brand'
 
 /**
  * Pantalla de bienvenida para quien clona el repositorio sin configurar.
@@ -8,6 +9,9 @@ import { getEnv } from '@core/infrastructure/env'
  * en blanco con un error en la consola. Quien acaba de clonar el proyecto no
  * tiene por qué abrir las herramientas de desarrollo para enterarse de que le
  * falta un archivo: se lo decimos en pantalla y con los pasos exactos.
+ *
+ * Este es el ÚNICO lugar de la app que usa el logo-principal: vive fuera del
+ * `AppShell`, sin header, así que aquí sí cabe la variante vertical grande.
  */
 export const SetupGuard = ({ children }: { readonly children: ReactNode }) => {
   try {
@@ -16,10 +20,11 @@ export const SetupGuard = ({ children }: { readonly children: ReactNode }) => {
     const detail = error instanceof Error ? error.message : String(error)
 
     return (
-      <div className="mx-auto flex min-h-svh max-w-xl flex-col justify-center gap-5 px-5 py-12">
+      <div className="mx-auto flex min-h-svh max-w-form flex-col justify-center gap-5 px-5 py-12">
         <div>
-          <p className="label-mono text-ink-faint">Dádiva · configuración</p>
-          <h1 className="mt-1 text-display-md">Falta conectar Supabase</h1>
+          <BrandLogo variant="principal" />
+          <p className="eyebrow mt-4">Configuración</p>
+          <h1 className="mt-1 text-h2">Falta conectar Supabase.</h1>
         </div>
 
         <p className="text-ink-soft">
@@ -34,11 +39,11 @@ export const SetupGuard = ({ children }: { readonly children: ReactNode }) => {
           ].map((step, index) => (
             <li
               key={step}
-              className="flex gap-3 rounded-sticker border-2 border-ink bg-paper p-4"
+              className="flex gap-3 rounded-tile border-2 border-ink bg-paper p-4 shadow-sticker-sm"
             >
               <span
                 aria-hidden="true"
-                className="grid size-7 shrink-0 place-items-center rounded-full border-2 border-ink bg-blush-300 text-sm font-semibold"
+                className="grid size-7 shrink-0 place-items-center rounded-full border-2 border-ink bg-blush-300 text-sm font-bold"
               >
                 {index + 1}
               </span>
@@ -54,7 +59,7 @@ export const SetupGuard = ({ children }: { readonly children: ReactNode }) => {
           ))}
         </ol>
 
-        <details className="rounded-sticker border-2 border-ink/20 bg-paper-deep p-4">
+        <details className="rounded-tile border-2 border-paper-shade bg-paper-deep p-4">
           <summary className="cursor-pointer text-sm font-medium">Ver el detalle técnico</summary>
           <pre className="mt-2 overflow-x-auto whitespace-pre-wrap font-mono text-xs text-ink-soft">
             {detail}

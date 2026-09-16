@@ -92,7 +92,7 @@ export const PrivacyPage = () => (
         <li>Salir de un grupo antes de que se haga el sorteo.</li>
         <li>
           Pedir que borremos tu cuenta y todo lo asociado a ella, escribiendo a{' '}
-          <a href={`mailto:${CONTACT}`} className="text-lilac-900 underline">
+          <a href={`mailto:${CONTACT}`} className="link">
             {CONTACT}
           </a>
           .
@@ -125,7 +125,7 @@ export const PrivacyPage = () => (
       <h2>Contacto</h2>
       <p>
         Cualquier duda o solicitud sobre tus datos:{' '}
-        <a href={`mailto:${CONTACT}`} className="text-lilac-900 underline">
+        <a href={`mailto:${CONTACT}`} className="link">
           {CONTACT}
         </a>
       </p>

@@ -3,7 +3,8 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import { isSafeReturnPath, rememberReturnTo } from '../routes/returnTo'
 import { useEntranceAnimation } from '@animations'
-import { Alert, Button, GoogleMark, Sticker } from '@ui/atoms'
+import { Alert, Button, GoogleMark, Sticker, VisibilityNote } from '@ui/atoms'
+import { Blob, Isotipo } from '@ui/brand'
 
 /**
  * Puerta de entrada.
@@ -44,15 +45,21 @@ export const SignInPage = () => {
   }
 
   return (
-    <div ref={containerRef} className="mx-auto flex max-w-md flex-col gap-6">
+    <div ref={containerRef} className="mx-auto flex max-w-narrow flex-col gap-6">
       <div data-animate className="text-center">
-        <h1 className="text-display-lg">Entra a Dádiva</h1>
+        <div className="relative isolate mx-auto grid size-44 place-items-center">
+          <Blob shape="a" tone="lilac" className="absolute inset-0 -z-10 size-full" />
+          <Isotipo size={96} />
+        </div>
+
+        <p className="eyebrow mt-4">Entrada</p>
+        <h1 className="mt-2 text-h1">Entra a Dádiva.</h1>
         <p className="mt-2 text-ink-soft">
           Un toque y listo. No necesitas crear ninguna contraseña.
         </p>
       </div>
 
-      <Sticker data-animate className="flex flex-col gap-5 p-6">
+      <Sticker data-animate size="card" className="flex flex-col gap-5 p-6">
         <Button
           variant="secondary"
           size="lg"
@@ -66,14 +73,20 @@ export const SignInPage = () => {
 
         {error && <Alert tone="error">{error}</Alert>}
 
-        <p className="text-center text-xs leading-relaxed text-ink-faint">
-          Usamos tu cuenta solo para saber quién eres dentro de tus grupos.
-          No publicamos nada ni leemos tu correo.
-        </p>
+        <VisibilityNote>
+          Usamos tu cuenta solo para saber quién eres dentro de tus grupos. No
+          publicamos nada ni leemos tu correo.
+        </VisibilityNote>
       </Sticker>
 
+      {/*
+        Antes decía "Entra primero y luego usa el código que te compartieron",
+        que quedó FALSO desde el fix del enlace de invitación (ver
+        src/app/routes/returnTo.ts): quien llega por invitación vuelve directo
+        a ese grupo, sin pasos extra.
+      */}
       <p data-animate className="text-center text-sm text-ink-soft">
-        ¿Te invitaron a un grupo? Entra primero y luego usa el código que te compartieron.
+        ¿Llegaste por un enlace de invitación? Al entrar, vuelves directo a ese grupo.
       </p>
     </div>
   )
