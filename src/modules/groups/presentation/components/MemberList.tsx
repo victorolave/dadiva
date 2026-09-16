@@ -1,5 +1,5 @@
 import { Crown, ScrollText, Sparkles } from 'lucide-react'
-import { Badge, Sticker } from '@ui/atoms'
+import { Avatar, Badge, Sticker } from '@ui/atoms'
 import type { Member } from '../../domain/entities/Member'
 
 export interface MemberListProps {
@@ -8,12 +8,24 @@ export interface MemberListProps {
 }
 
 export const MemberList = ({ members, currentUserId }: MemberListProps) => (
-  <section aria-labelledby="participantes" className="flex flex-col gap-3">
-    <h2 id="participantes" className="text-display-sm">
-      Quiénes van ({members.length})
-    </h2>
+  <section aria-labelledby="participantes" className="flex flex-col gap-4">
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <p className="eyebrow">Participantes</p>
+        <h2 id="participantes" className="mt-2 text-h3">
+          Quiénes van.
+        </h2>
+      </div>
 
-    <ul className="grid gap-2 sm:grid-cols-2">
+      <Badge tone="neutral">
+        {members.length} {members.length === 1 ? 'persona' : 'personas'}
+      </Badge>
+    </div>
+
+    {/* grid-cols-1 explícito: sin él, la columna implícita en móvil crece con
+          su contenido (no usa minmax(0,1fr)), el truncate del nombre nunca se
+          activa y un nombre largo desborda la pantalla a 360px. */}
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {members.map((member) => {
         const isMe = member.userId === currentUserId
 
@@ -22,14 +34,10 @@ export const MemberList = ({ members, currentUserId }: MemberListProps) => (
             key={member.id}
             as="li"
             tone={isMe ? 'blush' : 'paper'}
-            className="flex list-none items-center gap-3 p-3.5"
+            elevation="sm"
+            className="flex list-none items-center gap-3 rounded-tile p-3.5"
           >
-            <span
-              aria-hidden="true"
-              className="grid size-10 shrink-0 place-items-center rounded-full border-2 border-ink bg-paper text-lg"
-            >
-              {member.avatarEmoji}
-            </span>
+            <Avatar emoji={member.avatarEmoji} tint={isMe ? 'paper' : 'blush'} />
 
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">
@@ -45,13 +53,13 @@ export const MemberList = ({ members, currentUserId }: MemberListProps) => (
                   </Badge>
                 )}
                 {member.hasWishlist && (
-                  <Badge tone="sky">
+                  <Badge tone="neutral">
                     <ScrollText className="size-3" aria-hidden="true" />
                     Tiene lista
                   </Badge>
                 )}
                 {member.hasDrawnPromise && (
-                  <Badge tone="sage">
+                  <Badge tone="neutral">
                     <Sparkles className="size-3" aria-hidden="true" />
                     Promesa
                   </Badge>

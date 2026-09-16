@@ -1,18 +1,22 @@
 import { useState } from 'react'
-import { Check, Copy, Share2 } from 'lucide-react'
-import { Button, Sticker } from '@ui/atoms'
+import { Share2 } from 'lucide-react'
+import { Button } from '@ui/atoms'
 import type { InviteCode } from '../../domain/value-objects/InviteCode'
+import { GroupInvitationCard } from './GroupInvitationCard'
 
 export interface InviteCodeCardProps {
   readonly code: InviteCode
   readonly groupName: string
+  readonly hostName: string
+  readonly className?: string | undefined
 }
 
-export const InviteCodeCard = ({ code, groupName }: InviteCodeCardProps) => {
+export const InviteCodeCard = ({ code, groupName, hostName, className }: InviteCodeCardProps) => {
   const [copied, setCopied] = useState(false)
 
   const inviteUrl = `${window.location.origin}/unirse/${code.value}`
   const shareText = `Te invito al amigo secreto "${groupName}" en Dádiva. Entra con este enlace: ${inviteUrl}`
+  const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
 
   const handleCopy = async () => {
     try {
@@ -27,7 +31,7 @@ export const InviteCodeCard = ({ code, groupName }: InviteCodeCardProps) => {
 
   const handleShare = async () => {
     // `share` no existe en escritorio; ahí caemos a copiar, que es lo útil.
-    if (!navigator.share) {
+    if (!canShare) {
       await handleCopy()
       return
     }
@@ -40,42 +44,31 @@ export const InviteCodeCard = ({ code, groupName }: InviteCodeCardProps) => {
   }
 
   return (
-    <Sticker tone="lilac" className="flex flex-col gap-4 p-6">
-      <div>
-        <h2 className="label-mono text-ink-soft">Código de invitación</h2>
-        <p className="mt-1 font-mono text-3xl tracking-[0.18em]">{code.formatted}</p>
-      </div>
-
-      <p className="text-sm text-ink-soft">
-        Comparte el código o el enlace. Quien lo reciba entra directo al grupo.
-      </p>
-
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => void handleCopy()}
-          iconStart={
-            copied ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />
-          }
-        >
-          {copied ? 'Copiado' : 'Copiar enlace'}
-        </Button>
-
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => void handleShare()}
-          iconStart={<Share2 className="size-4" aria-hidden="true" />}
-        >
-          Compartir
-        </Button>
-      </div>
+    <GroupInvitationCard
+      groupName={groupName}
+      hostName={hostName}
+      codeText={code.formatted}
+      onCopyCode={() => void handleCopy()}
+      copied={copied}
+      className={className}
+    >
+      {/* Botón único de acción (UI kit del Design System): copia o comparte según lo que
+          soporte el dispositivo. La placa de código de arriba también copia
+          al tocarla, así que "copiar" siempre queda a un toque sin depender
+          de este botón. */}
+      <Button
+        variant="secondary"
+        onClick={() => void handleShare()}
+        className="border-ink bg-lilac-300 text-ink hover:bg-lilac-500 active:bg-lilac-500"
+        iconStart={<Share2 className="size-4" aria-hidden="true" />}
+      >
+        {canShare ? 'Compartir enlace' : 'Copiar enlace'}
+      </Button>
 
       {/* El estado de copiado se anuncia sin interrumpir al lector de pantalla. */}
       <p role="status" className="sr-only">
         {copied ? 'Enlace copiado al portapapeles' : ''}
       </p>
-    </Sticker>
+    </GroupInvitationCard>
   )
 }

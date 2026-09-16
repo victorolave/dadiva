@@ -4,7 +4,7 @@ import { useContainer } from '@app/composition/ContainerProvider'
 import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import type { DomainError } from '@core/domain/DomainError'
 import { useEntranceAnimation } from '@animations'
-import { Alert, Button, Sticker, TextAreaField, TextField } from '@ui/atoms'
+import { Alert, Button, LinkButton, Sticker, TextAreaField, TextField } from '@ui/atoms'
 
 export const CreateGroupPage = () => {
   const { groups } = useContainer()
@@ -52,11 +52,12 @@ export const CreateGroupPage = () => {
   const generalError = error && !error.field ? error.message : null
 
   return (
-    <div ref={containerRef} className="mx-auto flex max-w-xl flex-col gap-6">
+    <div ref={containerRef} className="mx-auto flex max-w-form flex-col gap-6">
       <header data-animate>
-        <h1 className="text-display-lg">Nuevo grupo</h1>
-        <p className="mt-1 text-ink-soft">
-          Solo el nombre es obligatorio. Lo demás lo puedes ajustar después.
+        <p className="eyebrow">Crear grupo</p>
+        <h1 className="mt-2 text-h1">Un grupo, un regalo por persona.</h1>
+        <p className="mt-2 text-lead text-ink-soft">
+          Después podrás invitar a quien quieras con un código.
         </p>
       </header>
 
@@ -107,10 +108,19 @@ export const CreateGroupPage = () => {
           {generalError && <Alert tone="error">{generalError}</Alert>}
 
           <Button type="submit" size="lg" fullWidth isLoading={isSaving}>
-            Crear grupo
+            Crear mi grupo
           </Button>
         </form>
       </Sticker>
+
+      {/* Wrapper con `data-animate`, no el `LinkButton` directo: el botón usa
+          `active:translate-*` y GSAP escribiría `transform` inline sobre el
+          mismo elemento, componiendo un desplazamiento doble. */}
+      <div data-animate className="self-center">
+        <LinkButton to="/unirse" variant="ghost">
+          Ya tengo un código
+        </LinkButton>
+      </div>
     </div>
   )
 }
