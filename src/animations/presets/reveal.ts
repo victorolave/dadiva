@@ -24,7 +24,7 @@ export const revealAssignment = (
     timeline
       .to(envelope, { rotate: -2, duration: 0.12, ease: 'power1.inOut', yoyo: true, repeat: 3 })
       .to(flap, {
-        rotateX: -172,
+        rotateX: 168,
         duration: DURATION.base,
         ease: EASE.glide,
         transformOrigin: 'top center',
@@ -34,8 +34,8 @@ export const revealAssignment = (
       // gesto se mantiene proporcionado aunque el nombre ocupe una o dos líneas.
       .fromTo(
         slip,
-        { yPercent: 8, autoAlpha: 0, scale: 0.94 },
-        { yPercent: -92, autoAlpha: 1, scale: 1, duration: DURATION.deliberate, ease: EASE.settle },
+        { yPercent: 14, autoAlpha: 0, scale: 0.94 },
+        { yPercent: -55, autoAlpha: 1, scale: 1, duration: DURATION.deliberate, ease: EASE.settle },
       )
       .fromTo(
         name,

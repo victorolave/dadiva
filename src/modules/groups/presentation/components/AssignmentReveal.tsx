@@ -91,43 +91,42 @@ export const AssignmentReveal = ({ assignment, onReveal }: AssignmentRevealProps
   return (
     <div className="relative flex flex-col items-center gap-6 overflow-hidden py-4">
       {/*
-        El sobre se dibuja en SVG y no con clip-path.
-        Un clip-path recorta el borde junto con el relleno: la solapa quedaba
-        como un triángulo de color sin contorno en sus diagonales, y el conjunto
-        no se leía como una figura cerrada. En SVG el trazo sigue el contorno
-        real de cada pieza, que es justo lo que pide la estética de tinta.
+        Sobre de cuatro paneles.
+        La versión anterior era un rectángulo con una solapa encima: leía como
+        una mancha, no como papel plegado. Aquí el rectángulo se divide en
+        cuatro triángulos que se encuentran en un punto por debajo del centro
+        (150,124 sobre un lienzo de 300x200), cada uno con un tono distinto.
+        La profundidad la dan los tonos, no los sombreados: exactamente el
+        recurso de los sobres plegados de papel.
 
-        Cuatro capas, en este orden de profundidad:
-          1. cuerpo    — el sobre completo, al fondo
-          2. papel     — sale de adentro
-          3. bolsillo  — panel frontal; tapa la parte baja del papel
-          4. solapa    — gira hacia atrás al abrirse
+        Capas, de atrás hacia adelante:
+          1. interior — el fondo claro que se ve al abrirse
+          2. nota     — sale por la abertura superior
+          3. paneles  — laterales y base, tapan el pie de la nota
+          4. solapa   — gira sobre su borde superior
       */}
       <div
         ref={envelopeRef}
         className="relative aspect-[3/2] w-full max-w-xs"
-        style={{ perspective: '900px' }}
+        style={{ perspective: '1100px' }}
       >
-        {/* 1 · cuerpo */}
+        {/* 1 · interior */}
         <svg viewBox="0 0 300 200" className="absolute inset-0 size-full" aria-hidden="true">
           <rect
-            x="1.5"
-            y="1.5"
-            width="297"
-            height="197"
-            rx="12"
-            className="fill-apricot-300 stroke-ink"
+            x="1.25"
+            y="1.25"
+            width="297.5"
+            height="197.5"
+            rx="14"
+            className="fill-apricot-100 stroke-ink"
             strokeWidth="2.5"
           />
         </svg>
 
-        {/* 2 · el papel con el nombre */}
+        {/* 2 · la nota con el nombre */}
         <div
           ref={slipRef}
-          // Arranca a media altura, escondido detrás del bolsillo, y sube sin
-          // llegar a despegarse: el pie queda tapado para que el papel parezca
-          // salir DE DENTRO del sobre y no flotar encima.
-          className="absolute inset-x-7 top-[52%] z-10 rounded-sticker border-2 border-ink bg-paper px-4 py-3 text-center opacity-0"
+          className="absolute inset-x-6 top-[6%] z-10 rounded-sticker border-2 border-ink bg-paper px-4 py-2.5 text-center opacity-0"
         >
           <p className="label-mono text-ink-faint">Te tocó</p>
           <p ref={nameRef} className="mt-1 font-display text-2xl leading-tight opacity-0">
@@ -135,44 +134,52 @@ export const AssignmentReveal = ({ assignment, onReveal }: AssignmentRevealProps
           </p>
         </div>
 
-        {/* 3 · bolsillo frontal: el papel parece salir de detrás de él */}
+        {/* 3 · paneles laterales y base */}
         <svg
           viewBox="0 0 300 200"
           className="pointer-events-none absolute inset-0 z-20 size-full"
           aria-hidden="true"
         >
-          <path
-            d="M1.5 96 L150 170 L298.5 96 L298.5 186.5 Q298.5 198.5 286.5 198.5 L13.5 198.5 Q1.5 198.5 1.5 186.5 Z"
-            className="fill-apricot-500 stroke-ink"
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-          />
+          <g className="stroke-ink" strokeWidth="2.5" strokeLinejoin="round">
+            <path
+              d="M1.25 15 Q1.25 1.25 15 1.25 L150 124 L15 198.75 Q1.25 198.75 1.25 185 Z"
+              className="fill-apricot-500"
+            />
+            <path
+              d="M298.75 15 Q298.75 1.25 285 1.25 L150 124 L285 198.75 Q298.75 198.75 298.75 185 Z"
+              className="fill-apricot-500"
+            />
+            <path
+              d="M1.25 185 Q1.25 198.75 15 198.75 L285 198.75 Q298.75 198.75 298.75 185 L150 124 Z"
+              className="fill-apricot-600"
+            />
+          </g>
         </svg>
 
         {/* 4 · solapa */}
         <div
           ref={flapRef}
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 z-30 h-[58%] origin-top"
+          className="absolute inset-0 z-30 origin-top"
           style={{ transformStyle: 'preserve-3d' }}
         >
-          <svg viewBox="0 0 300 116" className="size-full overflow-visible">
+          <svg viewBox="0 0 300 200" className="size-full overflow-visible">
             <path
-              d="M1.5 13.5 Q1.5 1.5 13.5 1.5 L286.5 1.5 Q298.5 1.5 298.5 13.5 L150 112 Z"
-              className="fill-apricot-500 stroke-ink"
+              d="M1.25 15 Q1.25 1.25 15 1.25 L285 1.25 Q298.75 1.25 298.75 15 L150 124 Z"
+              className="fill-apricot-300 stroke-ink"
               strokeWidth="2.5"
               strokeLinejoin="round"
             />
-            {/* Sello sobre la punta de la solapa: refuerza la lectura de
-                «cerrado» y se levanta junto con ella al abrir. */}
-            <circle cx="150" cy="93" r="15" className="fill-blush-500 stroke-ink" strokeWidth="2.5" />
+            {/* Sello sobre la punta: refuerza la lectura de «cerrado» y se
+                levanta junto con la solapa. */}
+            <circle cx="150" cy="104" r="14" className="fill-blush-500 stroke-ink" strokeWidth="2.5" />
             <text
               x="150"
-              y="93"
+              y="104"
               textAnchor="middle"
               dominantBaseline="central"
               className="fill-ink font-display"
-              fontSize="16"
+              fontSize="15"
             >
               D
             </text>

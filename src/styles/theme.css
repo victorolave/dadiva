@@ -39,6 +39,9 @@
   --color-apricot-100: #fdf0e4;
   --color-apricot-300: #f9d5b5;
   --color-apricot-500: #f4b183;
+  /* Escalón intermedio: da profundidad al panel inferior del sobre sin el
+     salto brusco que produce el 700. */
+  --color-apricot-600: #e09a63;
   --color-apricot-700: #c9773c;
   --color-apricot-900: #8a4d1f;
 
