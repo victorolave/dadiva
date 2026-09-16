@@ -107,7 +107,11 @@ export const AssignmentReveal = ({ assignment, onReveal }: AssignmentRevealProps
       */}
       <div
         ref={envelopeRef}
-        className="relative aspect-[3/2] w-full max-w-xs"
+        // drop-shadow y no box-shadow: box-shadow dibujaría la sombra del
+        // rectángulo contenedor, no la de los triángulos. drop-shadow sigue el
+        // contorno real del SVG, que es lo que hace juego con las calcomanías
+        // del resto de la app.
+        className="relative aspect-[3/2] w-full max-w-xs drop-shadow-[4px_4px_0_var(--color-ink)]"
         style={{ perspective: '1100px' }}
       >
         {/* 1 · interior */}
