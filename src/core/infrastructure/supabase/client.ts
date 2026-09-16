@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import { getEnv } from '../env'
+import { getEnv, getSupabaseKey } from '../env'
 import type { Database } from './database.types'
 
 export type DadivaClient = SupabaseClient<Database>
@@ -18,7 +18,7 @@ export const getSupabaseClient = (): DadivaClient => {
   if (client) return client
 
   const env = getEnv()
-  client = createClient<Database>(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY, {
+  client = createClient<Database>(env.VITE_SUPABASE_URL, getSupabaseKey(), {
     auth: {
       persistSession: true,
       autoRefreshToken: true,

@@ -29,7 +29,7 @@ export const SetupGuard = ({ children }: { readonly children: ReactNode }) => {
         <ol className="flex flex-col gap-3">
           {[
             'Copia el archivo de ejemplo:',
-            'Completa VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY con los datos de Project Settings → API.',
+            'Completa VITE_SUPABASE_URL y VITE_SUPABASE_PUBLISHABLE_KEY. Están en Dashboard → Settings → API Keys; copia la llave que empieza con sb_publishable_.',
             'Reinicia el servidor de desarrollo.',
           ].map((step, index) => (
             <li
