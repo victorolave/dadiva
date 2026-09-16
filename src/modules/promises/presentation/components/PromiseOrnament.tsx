@@ -5,6 +5,17 @@ interface OrnamentProps {
   readonly theme: PromiseTheme
 }
 
+export interface PromiseOrnamentProps extends OrnamentProps {
+  /**
+   * Opacidad del ornamento completo. El reverso lo usa al 100% (1, valor por
+   * defecto): ahí el ornamento ES el reverso. La cara revelada lo baja a
+   * 0.55 para que compita menos con el versículo, que además se protege con
+   * una placa del color de fondo del tema detrás del texto (ver
+   * `PromiseCardFace`).
+   */
+  readonly opacity?: number | undefined
+}
+
 /** Toma un color de la paleta de forma cíclica, sin salirse del arreglo. */
 const pick = (palette: readonly string[], index: number): string =>
   palette[index % palette.length] ?? palette[0] ?? '#efa8c8'
@@ -276,7 +287,7 @@ const RENDERERS: Record<PromisePattern, (props: OrnamentProps) => React.JSX.Elem
  * leer el versículo, no describirle guirnaldas a nadie. El viewBox fijo de
  * 200×290 permite escalar la tarjeta sin recalcular geometría.
  */
-export const PromiseOrnament = memo(function PromiseOrnament({ theme }: OrnamentProps) {
+export const PromiseOrnament = memo(function PromiseOrnament({ theme, opacity = 1 }: PromiseOrnamentProps) {
   const Pattern = RENDERERS[theme.pattern]
 
   return (
@@ -286,6 +297,7 @@ export const PromiseOrnament = memo(function PromiseOrnament({ theme }: Ornament
       aria-hidden="true"
       focusable="false"
       className="pointer-events-none absolute inset-0 size-full"
+      style={{ opacity }}
     >
       <Pattern theme={theme} />
     </svg>

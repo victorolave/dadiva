@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { prefersReducedMotion } from '@animations'
 import { cn } from '../utils/cn'
 import { Button } from '../atoms/Button'
+import isotipoMono128 from '../../assets/brand/isotipo-monocromo-128.webp'
 
 export interface ScratchRevealProps {
   /** Lo que queda debajo de la capa que se raspa. */
@@ -37,6 +38,21 @@ const SAMPLE_INTERVAL_MS = 120
 const FADE_MS = 420
 
 /**
+ * Isotipo monocromo compartido entre todas las instancias de la cubierta:
+ * un solo `Image` que se cachea y se reutiliza, en vez de crear uno por
+ * cada tarjeta que se raspa en la pantalla.
+ */
+let cachedIsotipoMono: HTMLImageElement | null = null
+const getIsotipoMono = (): HTMLImageElement => {
+  if (!cachedIsotipoMono) {
+    const img = new Image()
+    img.src = isotipoMono128
+    cachedIsotipoMono = img
+  }
+  return cachedIsotipoMono
+}
+
+/**
  * Raspa para revelar.
  *
  * La cubierta es un canvas encima del contenido. Al arrastrar se borra con
@@ -68,6 +84,15 @@ export const ScratchReveal = ({
 
   const [isRevealed, setIsRevealed] = useState(false)
   const [hasScratched, setHasScratched] = useState(false)
+  // `true` recién después de que el primer `fillRect` opaco pinta el canvas.
+  // Mientras es `false`, el contenido de abajo queda oculto con
+  // `visibility:hidden` (ver el wrapper más abajo): es la fuga de privacidad
+  // que se corrige acá. Sin esto, el canvas nace transparente (recién
+  // adquiere tamaño real un instante después) y en ese primer fotograma se
+  // alcanza a ver el nombre del amigo secreto debajo, aunque tenga
+  // `aria-hidden`, porque eso solo afecta al árbol de accesibilidad, no al
+  // pintado visual.
+  const [coverReady, setCoverReady] = useState(false)
 
   const reveal = useCallback(() => {
     if (hasRevealed.current) return
@@ -121,6 +146,12 @@ export const ScratchReveal = ({
     ctx.fillStyle = '#cbc8f1'
     ctx.fillRect(0, 0, width, height)
 
+    // A partir de acá el canvas ya es 100% opaco: es seguro dejar ver el
+    // contenido de abajo (el wrapper con `visibility:hidden` lo revela).
+    // Todo lo que sigue (chispas, isotipo, etiqueta) es decoración que se
+    // dibuja ENCIMA de un relleno que ya cubre por completo.
+    setCoverReady(true)
+
     // Chispas del mismo lenguaje que el reverso de las cartas del mazo.
     ctx.fillStyle = 'rgba(27, 25, 23, 0.14)'
     const step = 26
@@ -141,6 +172,28 @@ export const ScratchReveal = ({
       }
     }
 
+    // Isotipo monocromo centrado. Su interior transparente toma el color de
+    // la cubierta (lilac-300) que ya está pintada debajo. Se dibuja "mejor
+    // esfuerzo": si la imagen todavía no cargó o falla, seguimos sin ella —
+    // nunca bloquea el relleno opaco, que ya quedó garantizado arriba.
+    const mono = getIsotipoMono()
+    const drawMono = () => {
+      // Puede resolver después de que este componente se desmonte o de que
+      // ya se haya empezado a raspar; en ambos casos no hay canvas válido
+      // que pintar (o pintaríamos sobre el progreso de la persona).
+      if (!canvasRef.current || hasRevealed.current) return
+      try {
+        ctx.drawImage(mono, width / 2 - 22, height / 2 - 40, 44, 44)
+      } catch {
+        // SVG/WebP corrupto o decodificación fallida: se omite en silencio.
+      }
+    }
+    if (mono.complete && mono.naturalWidth > 0) {
+      drawMono()
+    } else {
+      mono.addEventListener('load', drawMono, { once: true })
+    }
+
     // Esperamos a las fuentes: si no, la etiqueta se dibuja con la tipografía
     // de reserva y queda distinta al resto de la interfaz.
     try {
@@ -152,12 +205,21 @@ export const ScratchReveal = ({
     ctx.fillStyle = '#1b1917'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.font = `500 13px 'DM Mono', ui-monospace, monospace`
-    ctx.letterSpacing = '0.18em'
-    ctx.fillText(coverLabel, width / 2, height / 2)
+    // Nunito Sans 700, igual que la utilidad `.eyebrow` del resto de la app
+    // (antes DM Mono, que ahora queda solo para código y datos técnicos).
+    ctx.font = `700 13px 'Nunito Sans', ui-sans-serif, sans-serif`
+    ctx.letterSpacing = '0.14em'
+    ctx.fillText(coverLabel, width / 2, height / 2 + 24)
   }, [coverLabel])
 
-  useEffect(() => {
+  // Ancla el pintado antes del primer pintado del navegador. Con `useEffect`
+  // React confirma el DOM (los `children` reales ya montados) y el navegador
+  // alcanza a pintar ESE fotograma antes de que el efecto corra; con
+  // `useLayoutEffect` el relleno opaco del canvas se dibuja de forma
+  // síncrona como parte del mismo commit, así que nunca existe un fotograma
+  // intermedio con la cubierta vacía. Esta es la otra mitad de la corrección
+  // de la fuga (la otra mitad es `coverReady` más abajo).
+  useLayoutEffect(() => {
     void paintCover()
 
     const container = containerRef.current
@@ -245,11 +307,16 @@ export const ScratchReveal = ({
       */}
       <div
         ref={containerRef}
-        className={cn('relative w-full overflow-hidden rounded-card', className)}
+        className={cn('relative w-full overflow-hidden rounded-hero', className)}
       >
-        {/* `aria-hidden` mientras está cubierto: quien usa lector de pantalla
-            no debe escuchar el nombre antes de pedir revelarlo. */}
-        <div aria-hidden="true">{children}</div>
+        {/* `aria-hidden` protege del árbol de accesibilidad; `visibility`
+            protege del pintado visual. Hacen falta las dos: un lector de
+            pantalla nunca debe anunciar el nombre antes de tiempo, y el
+            navegador nunca debe pintarlo antes de que la cubierta esté
+            lista (ver `coverReady` arriba). */}
+        <div aria-hidden="true" style={{ visibility: coverReady ? 'visible' : 'hidden' }}>
+          {children}
+        </div>
 
         <canvas
           ref={canvasRef}
@@ -282,7 +349,7 @@ export const ScratchReveal = ({
       </div>
 
       <div className="flex flex-col items-center gap-2">
-        <p className="label-mono text-ink-soft" role="status">
+        <p className="eyebrow" role="status">
           {hasScratched ? 'Sigue raspando…' : 'Raspa con el dedo para descubrirlo'}
         </p>
         <Button variant="ghost" size="sm" onClick={reveal}>

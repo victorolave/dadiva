@@ -2,7 +2,8 @@ import { useCallback, useRef, useState } from 'react'
 import { ExternalLink } from 'lucide-react'
 import { paperConfetti } from '@animations'
 import { ScratchReveal } from '@ui/molecules/ScratchReveal'
-import { Sticker } from '@ui/atoms'
+import { Avatar, Sticker } from '@ui/atoms'
+import { Blob } from '@ui/brand'
 import type { MyAssignment } from '../../domain/repositories/AssignmentRepository'
 
 export interface AssignmentRevealProps {
@@ -12,10 +13,23 @@ export interface AssignmentRevealProps {
 
 /** Panel con el nombre. Es lo que queda debajo de la capa que se raspa. */
 const ReceiverPanel = ({ assignment }: { readonly assignment: MyAssignment }) => (
-  <div className="flex min-h-44 flex-col items-center justify-center gap-2 bg-blush-100 px-6 text-center">
-    <p className="label-mono text-ink-soft">Tu amigo secreto es</p>
-    <p className="flex flex-wrap items-center justify-center gap-2 text-display-md">
-      <span aria-hidden="true">{assignment.receiverAvatarEmoji}</span>
+  <div className="relative isolate flex min-h-52 flex-col items-center justify-center gap-3 overflow-hidden bg-blush-300 px-6 text-center">
+    <Blob
+      shape="a"
+      tone="blush"
+      shade={500}
+      className="absolute top-1/2 left-1/2 -z-10 w-56 -translate-x-1/2 -translate-y-1/2"
+    />
+    {/*
+      La mancha de fondo es blush-500: ahí `ink-soft` no pasa AA (4,14). Como el eyebrow y el nombre quedan centrados
+      sobre esa mancha, van directo en `ink` en vez de en `.eyebrow` (que trae
+      `ink-soft` por defecto) para no depender del orden de las utilidades.
+    */}
+    <p className="eyebrow" style={{ color: 'var(--color-ink)' }}>
+      Tu amigo secreto es
+    </p>
+    <p className="flex flex-wrap items-center justify-center gap-2 text-h2 font-display">
+      <Avatar emoji={assignment.receiverAvatarEmoji} size="lg" tint="paper" />
       {assignment.receiverName}
     </p>
   </div>
@@ -56,13 +70,13 @@ export const AssignmentReveal = ({ assignment, onReveal }: AssignmentRevealProps
       */}
       <div className="w-full max-w-sm">
         {isOpen ? (
-          <Sticker tone="blush" className="overflow-hidden">
+          <Sticker tone="blush" strong size="hero" className="overflow-hidden shadow-celebrate">
             <ReceiverPanel assignment={assignment} />
           </Sticker>
         ) : (
           <ScratchReveal
             onRevealed={handleRevealed}
-            className="border-2 border-ink shadow-sticker-lg"
+            className="rounded-hero border-[3px] border-ink shadow-sticker-lg"
           >
             <ReceiverPanel assignment={assignment} />
           </ScratchReveal>
@@ -70,16 +84,13 @@ export const AssignmentReveal = ({ assignment, onReveal }: AssignmentRevealProps
       </div>
 
       {isOpen && (
-        <Sticker className="w-full max-w-sm p-5" data-animate>
+        <Sticker size="card" className="w-full max-w-sm p-5" data-animate>
           {assignment.wishlist.length > 0 ? (
             <div className="flex flex-col gap-2">
-              <h3 className="label-mono text-ink-soft">Lo que le gustaría</h3>
-              <ul className="flex flex-col gap-2">
+              <h3 className="eyebrow">Lo que le gustaría</h3>
+              <ul className="divide-y divide-paper-shade">
                 {assignment.wishlist.map((item, index) => (
-                  <li
-                    key={`${item.title}-${index}`}
-                    className="rounded-sticker border-2 border-ink/15 bg-paper px-3 py-2"
-                  >
+                  <li key={`${item.title}-${index}`} className="py-3">
                     <p className="font-medium">{item.title}</p>
                     {item.notes && <p className="text-sm text-ink-soft">{item.notes}</p>}
                     {item.url && (
@@ -87,7 +98,7 @@ export const AssignmentReveal = ({ assignment, onReveal }: AssignmentRevealProps
                         href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-1 inline-flex items-center gap-1 text-sm text-lilac-900 underline"
+                        className="link mt-1 inline-flex items-center gap-1 text-sm"
                       >
                         Ver enlace
                         <ExternalLink className="size-3.5" aria-hidden="true" />

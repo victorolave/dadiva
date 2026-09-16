@@ -33,10 +33,11 @@ export const geometryForWidth = (width: number): DeckGeometry => {
  * Ancla cada carta por su CENTRO sobre el punto (50%, 50%) del escenario.
  *
  * Se hace con xPercent/yPercent de GSAP y NO con `-translate-x-1/2` de
- * Tailwind: ambas escriben en la misma propiedad `transform`, y el primer
- * tween de GSAP que toque `x` o `y` borraría las clases de Tailwind. El
+ * Tailwind. Con las clases de Tailwind, el desplazamiento de centrado quedaba
+ * fuera del control de GSAP y los tweens de `x`/`y` no lo respetaban: el
  * resultado era un abanico corrido media carta a la derecha y hacia abajo,
- * cortado contra el borde inferior. GSAP compone xPercent con x sin pisarlo.
+ * cortado contra el borde inferior. Dejar todo el posicionamiento en GSAP
+ * elimina la ambigüedad: compone xPercent con x sin pisarlo.
  */
 export const anchorCards = (cards: readonly Element[]): void => {
   cards.forEach((card, index) => {
@@ -74,7 +75,15 @@ export const fanTransform = (index: number, total: number, geometry: DeckGeometr
   }
 }
 
-/** El mazo cerrado respira: una pulsación lenta que invita a tocarlo. */
+/**
+ * El mazo cerrado respira: una pulsación lenta que invita a tocarlo.
+ *
+ * `repeat: 1` (no `-1`): con `yoyo` eso es EXACTAMENTE una respiración
+ * completa (sube 1,8s + baja 1,8s = 3,6s) y se detiene sola. Un movimiento
+ * automático que nunca para viola WCAG 2.2.2 (Pausar, detener, ocultar) si
+ * no hay forma de pausarlo — y acá no la hay, así que en vez de agregar un
+ * control de pausa, el gesto simplemente deja de repetirse solo.
+ */
 export const idleDeckPulse = (target: Element): gsap.core.Tween | null => {
   if (prefersReducedMotion()) return null
 
@@ -82,7 +91,7 @@ export const idleDeckPulse = (target: Element): gsap.core.Tween | null => {
     y: -6,
     duration: 1.8,
     ease: 'sine.inOut',
-    repeat: -1,
+    repeat: 1,
     yoyo: true,
   })
 }

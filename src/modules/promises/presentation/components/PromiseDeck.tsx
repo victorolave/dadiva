@@ -174,7 +174,7 @@ export const PromiseDeck = ({ savedCard, highlight = [], onDraw, isBusy = false 
   if (phase === 'revealed' && revealedCard) {
     return (
       <div className="flex flex-col items-center gap-6">
-        <div ref={savedCardRef} className="w-full max-w-[19rem]">
+        <div ref={savedCardRef} className="w-full max-w-[20rem]">
           <PromiseCardFace card={revealedCard} highlight={highlight} />
         </div>
         <p
@@ -238,7 +238,9 @@ export const PromiseDeck = ({ savedCard, highlight = [], onDraw, isBusy = false 
                 className={cn(
                   // Sin `-translate-x-1/2`: el centrado lo pone GSAP con
                   // xPercent/yPercent para no pelear por la misma propiedad.
-                  'absolute left-1/2 top-1/2 w-[8.5rem] rounded-card sm:w-[10rem]',
+                  // `rounded-tile`, no `rounded-card`: a este tamaño (136–160px)
+                  // es la forma del anillo de foco de la carta del mazo.
+                  'absolute left-1/2 top-1/2 w-[8.5rem] rounded-tile sm:w-[10rem]',
                   phase === 'choosing'
                     ? 'cursor-pointer focus-visible:outline-4'
                     : 'cursor-default',
@@ -258,7 +260,11 @@ export const PromiseDeck = ({ savedCard, highlight = [], onDraw, isBusy = false 
                   className="will-change-transform"
                 >
                   {faceUp && revealedCard && index === chosenIndex ? (
-                    <PromiseCardFace card={revealedCard} highlight={highlight} />
+                    // `size="deck"`: esta cara todavía vive dentro de un botón
+                    // de 136–160px (el volteo pasa acá, no en el bloque grande
+                    // de abajo). El borde/radio/sombra "hero" a ese ancho se
+                    // vería como una pastilla.
+                    <PromiseCardFace card={revealedCard} highlight={highlight} size="deck" />
                   ) : (
                     <PromiseCardBack />
                   )}
@@ -283,7 +289,7 @@ export const PromiseDeck = ({ savedCard, highlight = [], onDraw, isBusy = false 
       )}
 
       {phase === 'choosing' && (
-        <p className="label-mono text-ink-soft" role="status">
+        <p className="eyebrow" role="status">
           Toca una carta · o usa las flechas y Enter
         </p>
       )}
