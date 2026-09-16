@@ -44,8 +44,10 @@ export const PrivacyPage = () => (
       </ul>
 
       <p>
-        No usamos cookies de publicidad ni de seguimiento. No hay analítica de terceros que
-        rastree tu navegación.
+        No usamos cookies de publicidad ni de seguimiento. Para saber cuántas visitas recibe
+        la aplicación y qué tan rápido carga, usamos Vercel Web Analytics y Speed Insights.
+        No usan cookies, no reciben tu nombre ni tu correo, y antes de enviar cada visita
+        quitamos de la dirección los códigos de invitación y los identificadores de grupo.
       </p>
     </section>
 

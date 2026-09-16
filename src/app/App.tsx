@@ -6,6 +6,7 @@ import { AuthProvider } from '@modules/auth/presentation/AuthProvider'
 import { AppShell } from './layouts/AppShell'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import { LandingPage } from './pages/LandingPage'
+import { Telemetry } from './telemetry/Telemetry'
 import { Skeleton } from '@ui/atoms'
 
 /**
@@ -61,6 +62,7 @@ export const App = () => (
   <SetupGuard>
     <ContainerProvider>
     <BrowserRouter>
+      <Telemetry />
       <AuthProvider>
         <Suspense fallback={<RouteFallback />}>
           <Routes>
