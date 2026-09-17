@@ -16,6 +16,10 @@
     "brand:assets": "bash scripts/brand-assets.sh"
   },
   "dependencies": {
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/nunito-sans": "^5.3.0",
+    "@fontsource/caveat": "^5.3.0",
+    "@fontsource/dm-mono": "^5.3.0",
     "@gsap/react": "^2.1.2",
     "@supabase/supabase-js": "^2.116.0",
     "@vercel/analytics": "^2.0.1",
@@ -38,6 +42,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
+    "axe-core": "^4.13.0",
     "jsdom": "^30.0.1",
     "oxlint": "^1.81.0",
     "tailwindcss": "^4.3.3",

@@ -28,6 +28,29 @@ export interface ScratchRevealProps {
  */
 const CONTEXT_OPTIONS: CanvasRenderingContext2DSettings = { willReadFrequently: true }
 
+/**
+ * Familia de la etiqueta del canvas, tal como la registra Fontsource en
+ * `--font-sans` (ver `src/styles/theme.css`). Se lee del token en vez de
+ * repetir el nombre literal aquí: un canvas no hereda CSS, así que
+ * `ctx.font` necesita el nombre EXACTO de la familia — si el token cambia
+ * (como pasó al migrar de la Google Fonts `'Nunito Sans'` a la
+ * autoalojada `'Nunito Sans Variable'`) y este archivo sigue con el nombre
+ * viejo, el canvas cae en silencio a la tipografía del sistema: no hay
+ * error, solo un texto que se ve distinto al resto de la app. Leyendo el
+ * token, un cambio de fuente futuro no puede volver a desincronizar esto.
+ */
+const FALLBACK_SANS_FONT_FAMILY =
+  "'Nunito Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif"
+
+export const resolveSansFontFamily = (): string => {
+  if (typeof document === 'undefined' || typeof getComputedStyle !== 'function') {
+    return FALLBACK_SANS_FONT_FAMILY
+  }
+
+  const token = getComputedStyle(document.documentElement).getPropertyValue('--font-sans').trim()
+  return token || FALLBACK_SANS_FONT_FAMILY
+}
+
 /** Radio del "dedo" que borra, en píxeles CSS. */
 const BRUSH_RADIUS = 26
 
@@ -194,9 +217,19 @@ export const ScratchReveal = ({
       mono.addEventListener('load', drawMono, { once: true })
     }
 
+    // Nunito Sans 700, igual que la utilidad `.eyebrow` del resto de la app
+    // (antes DM Mono, que ahora queda solo para código y datos técnicos).
+    const sansFontFamily = resolveSansFontFamily()
+    const canvasFont = `700 13px ${sansFontFamily}`
+
     // Esperamos a las fuentes: si no, la etiqueta se dibuja con la tipografía
-    // de reserva y queda distinta al resto de la interfaz.
+    // de reserva y queda distinta al resto de la interfaz. `fonts.ready` por
+    // sí solo solo cubre las fuentes que YA se pidieron para el layout
+    // actual: si nada más en pantalla usó todavía el peso 700 de la
+    // variable, esa cara concreta podría no estar cargada aún. `fonts.load`
+    // la pide explícitamente antes de esperar a `ready`.
     try {
+      await document.fonts.load(canvasFont)
       await document.fonts.ready
     } catch {
       // Sin soporte de la API de fuentes seguimos con la de reserva.
@@ -205,9 +238,7 @@ export const ScratchReveal = ({
     ctx.fillStyle = '#1b1917'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    // Nunito Sans 700, igual que la utilidad `.eyebrow` del resto de la app
-    // (antes DM Mono, que ahora queda solo para código y datos técnicos).
-    ctx.font = `700 13px 'Nunito Sans', ui-sans-serif, sans-serif`
+    ctx.font = canvasFont
     ctx.letterSpacing = '0.14em'
     ctx.fillText(coverLabel, width / 2, height / 2 + 24)
   }, [coverLabel])

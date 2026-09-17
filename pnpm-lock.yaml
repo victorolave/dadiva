@@ -8,6 +8,18 @@ importers:
 
   .:
     dependencies:
+      '@fontsource-variable/fraunces':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource-variable/nunito-sans':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/caveat':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/dm-mono':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@gsap/react':
         specifier: ^2.1.2
         version: 2.1.2(gsap@3.15.0)(react@19.3.0)
@@ -69,6 +81,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^6.1.1
         version: 6.1.1(vite@8.3.0(@types/node@24.13.4)(jiti@2.7.0))
+      axe-core:
+        specifier: ^4.13.0
+        version: 4.13.0
       jsdom:
         specifier: ^30.0.1
         version: 30.0.1
@@ -161,6 +176,18 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
+
+  '@fontsource-variable/fraunces@5.3.0':
+    resolution: {integrity: sha512-9BYGySn4AHEJdgp9Z28tQ3X+laJMEOITXkQarZXeloWQZDq5oOvXJ3kDA8c7MGIfpogIaZfjrQBqmda8POOCKA==}
+
+  '@fontsource-variable/nunito-sans@5.3.0':
+    resolution: {integrity: sha512-Vk1PSfckNDwgw2yGcsvJP3o/0zEW8Rp6KzbD8Ql/6iRHQshnhhAjt+cSIfAUyp5vQuSlleGHFW2LfYaaex0diw==}
+
+  '@fontsource/caveat@5.3.0':
+    resolution: {integrity: sha512-eHTfzQxFSW9ABERRLNruHoNJmKed2J7pqTUc5lp4a4POMgXGKpxmWj3d9Hz10kmAg6iuTTLe6UagbA4bnsmfQw==}
+
+  '@fontsource/dm-mono@5.3.0':
+    resolution: {integrity: sha512-OINjI8C1S/wpchhQxl7njZdMn4+hnDCpQ4YtvvOpKNARo+0J8O1x1IcrChxNjHOhfVv1by8C/FQoy3hXK+C1Ug==}
 
   '@gsap/react@2.1.2':
     resolution: {integrity: sha512-JqliybO1837UcgH2hVOM4VO+38APk3ECNrsuSM4MuXp+rbf+/2IG2K1YJiqfTcXQHH7XlA0m3ykniFYstfq0Iw==}
@@ -695,6 +722,10 @@ packages:
   assertion-error@2.0.1:
     resolution: {integrity: sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA==}
     engines: {node: '>=12'}
+
+  axe-core@4.13.0:
+    resolution: {integrity: sha512-UzGt8zg7Ny8djbYMhxl2zuEevVa7r2gJjYY5Lwr1xM7+XU2nd6CkIWFTVcCIbAP63vSz71NaVyyuSk9lHKcy0A==}
+    engines: {node: '>=4'}
 
   bidi-js@1.1.0:
     resolution: {integrity: sha512-fX1Onk0tdVPC7obPWB5EbJ1z7NVhLq4m2xZLq2YXBkxzMXIGRpNMU88n0EPgWseKl12J7zXs7qrDxPK4sRs2fg==}
@@ -1331,6 +1362,14 @@ snapshots:
 
   '@exodus/bytes@1.15.1': {}
 
+  '@fontsource-variable/fraunces@5.3.0': {}
+
+  '@fontsource-variable/nunito-sans@5.3.0': {}
+
+  '@fontsource/caveat@5.3.0': {}
+
+  '@fontsource/dm-mono@5.3.0': {}
+
   '@gsap/react@2.1.2(gsap@3.15.0)(react@19.3.0)':
     dependencies:
       gsap: 3.15.0
@@ -1656,6 +1695,8 @@ snapshots:
   aria-query@5.3.2: {}
 
   assertion-error@2.0.1: {}
+
+  axe-core@4.13.0: {}
 
   bidi-js@1.1.0:
     dependencies:

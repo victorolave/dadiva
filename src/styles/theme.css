@@ -1,5 +1,25 @@
 @import 'tailwindcss';
 
+/* Fuentes autoalojadas vía Fontsource: Vite las empaqueta como archivos
+   `/assets/*.woff2` con hash e inmutables (cacheados un año por
+   `vercel.json`), en vez de bloquear el render con una hoja de
+   fonts.googleapis.com. `opsz.css` trae los ejes opsz+wght que Fraunces y
+   Nunito Sans necesitan (el tamaño óptico se ajusta solo vía
+   `font-optical-sizing: auto`, el valor por defecto del navegador — nunca
+   se necesitó `font-variation-settings`, ver nota más abajo). DM Mono y
+   Caveat son estáticas: se importa solo el peso 500/600 que usa la app, y
+   solo los subconjuntos latin + latin-ext (con eso alcanza para
+   á é í ó ú ñ ¿ ¡). Fraunces/Nunito Sans no ofrecen ese recorte por
+   subconjunto en su build variable: `opsz.css` trae también los archivos
+   cyrillic/vietnamese, pero el navegador nunca los descarga porque su
+   `unicode-range` no matchea ningún carácter que la app renderice. */
+@import '@fontsource-variable/fraunces/opsz.css';
+@import '@fontsource-variable/nunito-sans/opsz.css';
+@import '@fontsource/dm-mono/latin-500.css';
+@import '@fontsource/dm-mono/latin-ext-500.css';
+@import '@fontsource/caveat/latin-600.css';
+@import '@fontsource/caveat/latin-ext-600.css';
+
 /* ------------------------------------------------------------------
    Dádiva — Sistema de diseño
    Estética: cuaderno de apuntes. Papel crema cuadriculado, tinta negra,
@@ -78,8 +98,11 @@
   --color-success-soft: #e9f3e7;
 
   /* --- Tipografía --- */
-  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
-  --font-sans: 'Nunito Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Nombres de familia con sufijo "Variable": así los registra Fontsource
+     para las variables de Fraunces y Nunito Sans (@fontsource-variable/*),
+     para no chocar con una eventual carga futura de sus cortes estáticos. */
+  --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Nunito Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: 'DM Mono', ui-monospace, 'SFMono-Regular', monospace;
   --font-script: 'Caveat', 'Bradley Hand', cursive;
 
