@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useOptionalContainer } from '@app/composition/ContainerProvider'
 import { useAuth } from '@modules/auth/presentation/AuthProvider'
 import { Alert, LinkButton, Skeleton, Sticker } from '@ui/atoms'
 import { Isotipo } from '@ui/brand'
@@ -56,6 +57,14 @@ export const AuthCallbackPage = () => {
   const { status, user } = useAuth()
   const navigate = useNavigate()
   const [timedOut, setTimedOut] = useState(false)
+  // 'loading' ahora también cubre el `import()` dinámico del contenedor de
+  // dependencias (ver `ContainerProvider`), que en una conexión lenta puede
+  // tardar más que la validación de Supabase en sí. Arrancar la cuenta
+  // regresiva antes de que el contenedor exista mediría ESE tiempo de
+  // descarga como si fuera la validación del enlace, y produciría un falso
+  // "no pudimos validar el enlace" para alguien que solo tiene internet
+  // lento, no un enlace roto.
+  const container = useOptionalContainer()
 
   // Se lee una sola vez: Supabase limpia la URL después de procesarla.
   const urlError = useMemo(readErrorFromUrl, [])
@@ -64,11 +73,11 @@ export const AuthCallbackPage = () => {
   const [returnTo] = useState(readReturnTo)
 
   useEffect(() => {
-    if (status !== 'loading') return
+    if (status !== 'loading' || !container) return
 
     const timer = window.setTimeout(() => setTimedOut(true), 10_000)
     return () => window.clearTimeout(timer)
-  }, [status])
+  }, [status, container])
 
   useEffect(() => {
     if (status !== 'authenticated' || !user) return

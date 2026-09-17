@@ -72,7 +72,15 @@ export const SignInPage = () => {
           size="lg"
           fullWidth
           onClick={() => void handleGoogle()}
-          isLoading={isRedirecting}
+          // `status === 'loading'` incluye el `import()` del contenedor de
+          // dependencias (ver `ContainerProvider`): sin este flag, un clic
+          // en el instante en que la página se monta llamaría a
+          // `signInWithGoogle` antes de que el contenedor exista y
+          // devolvería el error de "todavía estamos preparando la sesión"
+          // en vez de ir a Google. Con `isLoading` el botón se ve ocupado
+          // (mismo patrón que `isRedirecting`) hasta que de verdad puede
+          // responder al primer clic.
+          isLoading={isRedirecting || status === 'loading'}
           iconStart={<GoogleMark className="size-5" />}
         >
           Continuar con Google

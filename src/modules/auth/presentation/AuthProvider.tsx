@@ -1,7 +1,22 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { useContainer } from '@app/composition/ContainerProvider'
-import type { DomainError } from '@core/domain/DomainError'
+import { useOptionalContainer } from '@app/composition/ContainerProvider'
+import { DomainErrors, type DomainError } from '@core/domain/DomainError'
 import type { AuthenticatedUser } from '../domain/entities/AuthenticatedUser'
+
+/**
+ * Error de las acciones de sesión (entrar, pedir enlace, completar perfil,
+ * salir) cuando se llaman antes de que el contenedor de dependencias termine
+ * de cargar (ver `ContainerProvider`). En la práctica no debería pasar: los
+ * botones que disparan estas acciones solo existen una vez que hay usuario o
+ * en rutas donde el contenedor se carga de inmediato, pero un guard explícito
+ * es mejor que un `Cannot read properties of null` si algún día cambia esa
+ * garantía.
+ */
+const containerNotReadyError = (): DomainError =>
+  DomainErrors.infrastructure(
+    'CONTAINER_NOT_READY',
+    'Danos un segundo, todavía estamos preparando la sesión. Intenta de nuevo.',
+  )
 
 export type AuthStatus = 'loading' | 'authenticated' | 'anonymous'
 
@@ -27,11 +42,18 @@ const AuthContext = createContext<AuthContextValue | null>(null)
  * Supabase confirme el token — un bug visual clásico y muy feo.
  */
 export const AuthProvider = ({ children }: { readonly children: ReactNode }) => {
-  const { auth } = useContainer()
+  // Nullable a propósito: `ContainerProvider` carga el contenedor (y con él
+  // Supabase) bajo demanda, y `AuthProvider` es lo primero que lo consume.
+  // Mientras sea `null`, el estado se queda en 'loading' — nunca 'anonymous',
+  // que confundiría a quien sí tiene sesión con un parpadeo al login.
+  const container = useOptionalContainer()
+  const auth = container?.auth ?? null
   const [user, setUser] = useState<AuthenticatedUser | null>(null)
   const [status, setStatus] = useState<AuthStatus>('loading')
 
   useEffect(() => {
+    if (!auth) return
+
     let active = true
 
     void auth.repository.getCurrentUser().then((result) => {
@@ -51,19 +73,23 @@ export const AuthProvider = ({ children }: { readonly children: ReactNode }) => 
       active = false
       unsubscribe()
     }
-  }, [auth.repository])
+  }, [auth])
 
   const signInWithGoogle = useCallback(async () => {
+    if (!auth) return containerNotReadyError()
+
     const result = await auth.signInWithGoogle.execute({
       redirectTo: `${window.location.origin}/entrar/confirmar`,
     })
     // Devolvemos el error o null: si todo va bien el navegador ya se fue a
     // Google y nadie llega a leer esta respuesta.
     return result.match<DomainError | null>({ ok: () => null, err: (error) => error })
-  }, [auth.signInWithGoogle])
+  }, [auth])
 
   const requestMagicLink = useCallback(
     async (email: string) => {
+      if (!auth) return containerNotReadyError()
+
       const result = await auth.requestMagicLink.execute({
         email,
         redirectTo: `${window.location.origin}/entrar/confirmar`,
@@ -73,11 +99,13 @@ export const AuthProvider = ({ children }: { readonly children: ReactNode }) => 
         err: (error) => error,
       })
     },
-    [auth.requestMagicLink],
+    [auth],
   )
 
   const completeProfile = useCallback(
     async (input: { displayName: string; avatarEmoji: string }) => {
+      if (!auth) return containerNotReadyError()
+
       const result = await auth.completeProfile.execute(input)
       return result.match<AuthenticatedUser | DomainError>({
         ok: (updated) => {
@@ -87,14 +115,16 @@ export const AuthProvider = ({ children }: { readonly children: ReactNode }) => 
         err: (error) => error,
       })
     },
-    [auth.completeProfile],
+    [auth],
   )
 
   const signOut = useCallback(async () => {
+    if (!auth) return
+
     await auth.signOut.execute()
     setUser(null)
     setStatus('anonymous')
-  }, [auth.signOut])
+  }, [auth])
 
   const value = useMemo<AuthContextValue>(
     () => ({ status, user, signInWithGoogle, requestMagicLink, completeProfile, signOut }),

@@ -56,38 +56,42 @@ const RouteFallback = () => (
  * Raíz de la aplicación.
  *
  * El orden de los proveedores importa: el contenedor de dependencias envuelve
- * a AuthProvider porque este consume el repositorio de autenticación de aquel.
+ * a AuthProvider porque este consume el repositorio de autenticación de
+ * aquel. `ContainerProvider` va DENTRO de `BrowserRouter` (y no fuera, como
+ * antes) porque necesita `useLocation()` para decidir cuándo cargar el
+ * contenedor bajo demanda — ver el comentario grande en
+ * `composition/ContainerProvider.tsx`.
  */
 export const App = () => (
   <SetupGuard>
-    <ContainerProvider>
     <BrowserRouter>
-      <Telemetry />
-      <AuthProvider>
-        <Suspense fallback={<RouteFallback />}>
-          <Routes>
-            <Route element={<AppShell />}>
-              <Route index element={<LandingPage />} />
-              <Route path="entrar" element={<SignInPage />} />
-              <Route path="entrar/confirmar" element={<AuthCallbackPage />} />
-              <Route path="privacidad" element={<PrivacyPage />} />
-              <Route path="terminos" element={<TermsPage />} />
+      <ContainerProvider>
+        <Telemetry />
+        <AuthProvider>
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              <Route element={<AppShell />}>
+                <Route index element={<LandingPage />} />
+                <Route path="entrar" element={<SignInPage />} />
+                <Route path="entrar/confirmar" element={<AuthCallbackPage />} />
+                <Route path="privacidad" element={<PrivacyPage />} />
+                <Route path="terminos" element={<TermsPage />} />
 
-              <Route element={<ProtectedRoute />}>
-                <Route path="perfil" element={<ProfilePage />} />
-                <Route path="grupos" element={<GroupsPage />} />
-                <Route path="grupos/nuevo" element={<CreateGroupPage />} />
-                <Route path="grupos/:id" element={<GroupDetailPage />} />
-                <Route path="unirse" element={<JoinGroupPage />} />
-                <Route path="unirse/:code" element={<JoinGroupPage />} />
+                <Route element={<ProtectedRoute />}>
+                  <Route path="perfil" element={<ProfilePage />} />
+                  <Route path="grupos" element={<GroupsPage />} />
+                  <Route path="grupos/nuevo" element={<CreateGroupPage />} />
+                  <Route path="grupos/:id" element={<GroupDetailPage />} />
+                  <Route path="unirse" element={<JoinGroupPage />} />
+                  <Route path="unirse/:code" element={<JoinGroupPage />} />
+                </Route>
+
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
-
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Route>
-          </Routes>
-        </Suspense>
-      </AuthProvider>
+            </Routes>
+          </Suspense>
+        </AuthProvider>
+      </ContainerProvider>
     </BrowserRouter>
-    </ContainerProvider>
   </SetupGuard>
 )
